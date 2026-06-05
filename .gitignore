@@ -13,9 +13,6 @@ out/
 .env.test.local
 .env.production.local
 
-# Sanity
-sanity/
-
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
