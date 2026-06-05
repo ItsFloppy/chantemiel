@@ -137,7 +137,7 @@ All SEO is centralised around `SITE_URL` in `lib/seo.ts`.
 - **Metadata** — `app/layout.tsx` exports a full `Metadata`: `metadataBase`, title template, keywords (geo-targeted), canonical, `robots`, OpenGraph (`fr_FR`, 1200×630 image) and Twitter card. Page `<title>`/`<meta>` carry the keywords; on-page headings stay editorial.
 - **Generated routes** (Next.js file conventions): `app/robots.ts` (allows all, disallows `/studio`, declares sitemap), `app/sitemap.ts` (homepage + section anchors), `app/manifest.ts` (PWA), `app/icon.jpg` + `app/apple-icon.jpg` (favicons, copies of `logo.jpg`).
 - **Structured data (JSON-LD)** — `lib/seo.ts` builds it, `components/JsonLd.tsx` (server component) injects it in `page.tsx`:
-  - `buildLocalBusinessLd()` — `LocalBusiness`/`FoodEstablishment` (address, geo, tel, Ecocert credential) → Google local pack.
+  - `buildLocalBusinessLd()` — `LocalBusiness` (address, geo, tel, Ecocert credential) → Google local pack. Not `FoodEstablishment` (that type expects `servesCuisine`, irrelevant for a honey farm).
   - `buildProductsLd(miels)` — one `Product` per honey, one `Offer` per format (price EUR, in/out of stock).
   - `buildFaqLd()` — `FAQPage` from `FAQ_ITEMS` (same array feeds the visible `Faq.tsx` section, so copy stays in sync).
 - **`/studio` is `noindex`** — `app/studio/[[...tool]]/page.tsx` spreads `next-sanity/studio` metadata and overrides `robots: { index: false, follow: false }`.

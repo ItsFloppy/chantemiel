@@ -21,7 +21,7 @@ const business = {
 export function buildLocalBusinessLd() {
   return {
     '@context': 'https://schema.org',
-    '@type': ['LocalBusiness', 'FoodEstablishment'],
+    '@type': 'LocalBusiness',
     '@id': `${SITE_URL}/#business`,
     name: business.name,
     legalName: business.legalName,
