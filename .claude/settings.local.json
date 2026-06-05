@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "PowerShell(Get-ChildItem public\\\\images\\\\BeeOnLavender.mp4 | Select-Object Name, @{n='MB';e={[math]::Round\\($_.Length/1MB,2\\)}})",
+      "PowerShell(Remove-Item *)",
+      "PowerShell(npm run *)",
+      "PowerShell(npx tsc --noEmit 2>&1 | Select-Object -First 20; \"TSC_EXIT=$LASTEXITCODE\")"
     ]
   }
 }

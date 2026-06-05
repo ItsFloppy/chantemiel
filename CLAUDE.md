@@ -166,7 +166,7 @@ components/
     SectionLabel.tsx        Great Vibes filigrane label, -translate-y-[130%], z-index -1; opacity via --section-label-opacity
     StatutPastille.tsx      Sage dot "Dispo" / grey dot "Épuisé"
   Header.tsx                Scroll-aware fixed nav, solid = scrolled || open, mobile burger
-  Hero.tsx                  Full-bleed image, BioBadge, two CTAs
+  Hero.tsx                  Full-bleed autoplay video (BeeOnLavender), poster fallback, BioBadge, two CTAs
   Valeurs.tsx               4 trust pillars; centered, numbers in honey ring, vertical dividers
   Catalogue.tsx             Honey card grid; stepper +/− per format; duochromie on sold-out
   BonDeCommande.tsx         Order form + cart recap; confetti on submit success
@@ -194,7 +194,8 @@ scripts/
 
 public/images/
   miel-*.jpg                Six honey product photos
-  pyramide-pots.jpg         Hero background
+  BeeOnLavender.mp4         Hero background video (720×1280, ~7 MB, H.264; compressed from a .mov master that is gitignored)
+  pyramide-pots.jpg         Hero poster / video fallback
   sophie-ruches.jpg         APropos portrait
   ruches-verte.jpg          APropos thumbnail vignette
   ruches-bleue.jpg          Unused (available)

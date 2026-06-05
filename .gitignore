@@ -35,3 +35,6 @@ yarn-error.log*
 # Misc
 *.pem
 design_archive/
+
+# Raw video masters — only the compressed .mp4/.webm derivatives are committed
+public/images/*.mov

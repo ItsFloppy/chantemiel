@@ -1,18 +1,20 @@
-import Image from 'next/image'
 import { Reveal } from './ui/Reveal'
 import { BioBadge } from './ui/BioBadge'
 
 export function Hero() {
   return (
     <section id="top" className="relative min-h-[100svh] w-full overflow-hidden">
-      <Image
-        src="/images/pyramide-pots.jpg"
-        alt="Pots de miel Chantemiel posés sur un tronc, devant le massif du Luberon"
-        fill
-        priority
-        className="object-cover object-center"
-        sizes="100vw"
-      />
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        poster="/images/pyramide-pots.jpg"
+        aria-label="Abeille butinant un brin de lavande"
+        className="absolute inset-0 h-full w-full object-cover object-center"
+      >
+        <source src="/images/BeeOnLavender.mp4" type="video/mp4" />
+      </video>
       <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/40 to-ink/55" />
       <div className="absolute inset-0 bg-gradient-to-r from-ink/55 to-transparent" />
 
