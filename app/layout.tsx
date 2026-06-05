@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Playfair_Display, EB_Garamond, Great_Vibes } from 'next/font/google'
 import { CartProvider } from '@/lib/cart'
+import { SITE_URL } from '@/lib/seo'
 import './globals.css'
 
 const playfairDisplay = Playfair_Display({
@@ -23,12 +24,65 @@ const greatVibes = Great_Vibes({
 })
 
 export const metadata: Metadata = {
-  title: 'Chantemiel — Miels de Provence certifiés BIO',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'Chantemiel — Miel bio de Provence | Apicultrice à L’Isle-sur-la-Sorgue (Vaucluse)',
+    template: '%s · Chantemiel',
+  },
   description:
-    "Sophie Mus, apicultrice récoltante dans le Vaucluse. Deux cents ruches, six miels du Luberon aux Cévennes, certifiés BIO Ecocert.",
+    "Sophie Mus, apicultrice récoltante certifiée BIO Ecocert dans le Vaucluse. Six miels de Provence — lavande, romarin, châtaignier, acacia — récoltés et mis en pot à froid. Vente directe et points de vente en Vaucluse et Bouches-du-Rhône.",
+  keywords: [
+    'miel bio',
+    'miel bio Vaucluse',
+    'miel bio Provence',
+    'apiculteur bio',
+    "apicultrice L'Isle-sur-la-Sorgue",
+    'miel de lavande bio',
+    'miel de Provence',
+    'miel Luberon',
+    'Chantemiel',
+    'Sophie Mus',
+  ],
+  authors: [{ name: 'Sophie Mus' }],
+  creator: 'Chantemiel',
+  applicationName: 'Chantemiel',
+  alternates: {
+    canonical: '/',
+  },
+  category: 'food',
+  formatDetection: { telephone: true, email: true, address: true },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   openGraph: {
-    title: 'Chantemiel — Miels de Provence certifiés BIO',
-    description: "Six miels d'exception récoltés à la main en Provence, certifiés Agriculture Biologique.",
+    type: 'website',
+    locale: 'fr_FR',
+    url: SITE_URL,
+    siteName: 'Chantemiel',
+    title: 'Chantemiel — Miel bio de Provence, récolté à L’Isle-sur-la-Sorgue',
+    description:
+      "Six miels d'exception récoltés à la main en Provence par Sophie Mus, certifiés Agriculture Biologique (Ecocert).",
+    images: [
+      {
+        url: '/images/pyramide-pots.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Pots de miel Chantemiel devant le massif du Luberon',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Chantemiel — Miel bio de Provence',
+    description:
+      'Six miels de Provence certifiés BIO Ecocert, récoltés par Sophie Mus dans le Vaucluse.',
     images: ['/images/pyramide-pots.jpg'],
   },
 }

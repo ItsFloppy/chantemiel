@@ -162,7 +162,7 @@ export function BonDeCommande({ miels }: { miels: Miel[] }) {
         <div className="mb-12 max-w-2xl">
           <SectionLabel className="!text-honey/50">Bon de commande</SectionLabel>
           <h2 className="mt-4 font-display text-4xl leading-tight text-cream md:text-5xl">
-            Composez votre commande
+            Commandez en direct
           </h2>
           <p className="mt-4 font-body text-base leading-relaxed text-cream/70">
             Pas de paiement en ligne : vous composez votre panier, je reçois votre demande par

@@ -18,7 +18,7 @@ function CarteMiel({ miel }: { miel: Miel }) {
         <div className="relative flex min-h-[21rem] flex-1 flex-col overflow-hidden rounded-t-2xl will-change-transform">
           <Image
             src={miel.image}
-            alt={`Pot de ${miel.nom}`}
+            alt={`Pot de ${miel.nom} bio Chantemiel — terroir ${miel.terroir}`}
             fill
             className={
               'object-cover transition-transform duration-[1.2s] group-hover:scale-105 ' +
@@ -158,7 +158,7 @@ export function Catalogue({ miels }: { miels: Miel[] }) {
           <div className="max-w-2xl">
             <SectionLabel>La gamme</SectionLabel>
             <h2 className="mt-4 font-display text-4xl leading-tight text-ink md:text-5xl">
-              Six miels, six terroirs,<br className="hidden md:block" /> une seule main.
+              Six miels,<br className="hidden md:block" /> au fil des saisons.
             </h2>
           </div>
 

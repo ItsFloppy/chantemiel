@@ -1,9 +1,9 @@
 import { Reveal } from './ui/Reveal'
 
 const VALEURS = [
-  { titre: 'Certifié BIO', texte: 'Contrôlée par Ecocert selon le cahier des charges de l\'apiculture biologique.' },
+  { titre: 'Certifié bio Ecocert', texte: 'Contrôlée par Ecocert selon le cahier des charges de l\'apiculture biologique.' },
   { titre: 'Extraction à froid', texte: 'Miel extrait et conditionné à température ambiante : propriétés préservées.' },
-  { titre: '200 ruches', texte: 'Une petite exploitation familiale, chaque geste mené par Sophie elle-même.' },
+  { titre: '200 ruches, à la main', texte: 'Une petite exploitation familiale, chaque geste mené par Sophie elle-même.' },
   { titre: 'Terroirs de Provence', texte: 'Du Luberon aux Maures, des emplacements choisis loin des grands axes.' },
 ]
 

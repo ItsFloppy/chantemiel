@@ -24,8 +24,8 @@ export function Hero() {
 
           <Reveal delay={120}>
             <h1 className="mt-6 font-display text-[2.7rem] leading-[1.04] text-cream sm:text-6xl md:text-7xl">
-              Le miel comme<br className="hidden sm:block" /> on n&apos;en fait{' '}
-              <span className="italic text-honey">presque</span> plus.
+              Du miel bio de{' '}
+              <span className="italic text-honey">Provence</span>,<br className="hidden sm:block" /> récolté à la main.
             </h1>
           </Reveal>
 

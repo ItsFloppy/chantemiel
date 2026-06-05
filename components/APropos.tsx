@@ -32,7 +32,7 @@ export function APropos() {
             <Reveal>
               <SectionLabel>La miellerie</SectionLabel>
               <h2 className="mt-4 font-display text-4xl leading-tight text-ink md:text-5xl">
-                De la passion<br /> au savoir-faire
+                Une petite miellerie<br /> de famille, en Provence
               </h2>
             </Reveal>
 
