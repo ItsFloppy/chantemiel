@@ -111,7 +111,7 @@ export function CartFab({ miels }: { miels: Miel[] }) {
               ' absolute inset-x-3 bottom-3 max-h-[86vh] overflow-hidden rounded-3xl shadow-jar ring-1 ring-cream/10 sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-[440px] md:bottom-7 md:right-7'
             }
           >
-            <div className="scroll-cart max-h-[86vh] overflow-y-auto bg-ink p-6 text-cream">
+            <div className="scroll-cart max-h-[86vh] overflow-y-auto bg-ink p-6 pr-4 text-cream">
               <div className="mb-5 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <span className="grid h-9 w-9 place-items-center rounded-full bg-honey/15 text-honey">

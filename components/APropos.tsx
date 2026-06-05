@@ -28,7 +28,7 @@ export function APropos() {
             </div>
           </Reveal>
 
-          <div>
+          <div className="mt-8 lg:mt-0">
             <Reveal>
               <SectionLabel>La miellerie</SectionLabel>
               <h2 className="mt-4 font-display text-4xl leading-tight text-ink md:text-5xl">

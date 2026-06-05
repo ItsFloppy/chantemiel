@@ -116,7 +116,7 @@ export function PointsDeVente() {
               <div className="flex items-center justify-between px-5 pb-3 pt-5 md:px-6">
                 <span className="font-body text-lg font-semibold text-ink">{POINTS_DE_VENTE.length} points de vente</span>
               </div>
-              <ul className="scroll-soft flex-1 overflow-y-auto px-3 pb-4 lg:max-h-[535px] md:px-4">
+              <ul className="scroll-soft max-h-[340px] flex-1 overflow-y-auto px-3 pb-4 sm:max-h-[420px] md:px-4 lg:max-h-[535px]">
                 {POINTS_DE_VENTE.map(p => {
                   const actif = selected === p.id
                   return (

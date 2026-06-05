@@ -21,21 +21,25 @@ export function Header() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // Fond clair dès que l'on scrolle OU que le menu mobile est ouvert,
+  // pour garder les libellés lisibles même tout en haut de page.
+  const solid = scrolled || open
+
   return (
     <header
       className={
         'fixed inset-x-0 top-0 z-50 transition-all duration-500 ' +
-        (scrolled
+        (solid
           ? 'bg-cream/95 backdrop-blur-md shadow-[0_1px_0_rgba(42,28,14,0.08)]'
           : 'bg-gradient-to-b from-black/45 to-transparent')
       }
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 md:px-10">
         <Link href="#top" className="flex items-baseline gap-2 leading-none">
-          <span className={'font-hand text-3xl md:text-4xl transition-colors ' + (scrolled ? 'text-honey-deep' : 'text-cream')}>
+          <span className={'font-hand text-3xl md:text-4xl transition-colors ' + (solid ?'text-honey-deep' : 'text-cream')}>
             Chantemiel
           </span>
-          <span className={'hidden font-body text-[10px] font-semibold uppercase tracking-[0.22em] lg:inline ' + (scrolled ? 'text-ink/50' : 'text-cream/70')}>
+          <span className={'hidden font-body text-[10px] font-semibold uppercase tracking-[0.22em] lg:inline ' + (solid ?'text-ink/50' : 'text-cream/70')}>
             Apiculture BIO
           </span>
         </Link>
@@ -47,7 +51,7 @@ export function Header() {
               href={n.href}
               className={
                 'group relative font-body text-sm font-semibold tracking-wide transition-colors ' +
-                (scrolled ? 'text-ink/80 hover:text-honey-deep' : 'text-cream/90 hover:text-cream')
+                (solid ?'text-ink/80 hover:text-honey-deep' : 'text-cream/90 hover:text-cream')
               }
             >
               {n.label}
@@ -65,7 +69,7 @@ export function Header() {
         <button
           onClick={() => setOpen(v => !v)}
           aria-label="Menu"
-          className={'flex h-10 w-10 flex-col items-center justify-center gap-1.5 md:hidden ' + (scrolled ? 'text-ink' : 'text-cream')}
+          className={'flex h-10 w-10 flex-col items-center justify-center gap-1.5 md:hidden ' + (solid ?'text-ink' : 'text-cream')}
         >
           <span className={'h-0.5 w-6 bg-current transition-all ' + (open ? 'translate-y-2 rotate-45' : '')} />
           <span className={'h-0.5 w-6 bg-current transition-all ' + (open ? 'opacity-0' : '')} />
@@ -75,7 +79,7 @@ export function Header() {
 
       <div
         className={
-          'overflow-hidden bg-cream/98 backdrop-blur-md transition-all duration-300 md:hidden ' +
+          'overflow-hidden bg-cream backdrop-blur-md transition-all duration-300 md:hidden ' +
           (open ? 'max-h-96 border-t border-ink/10' : 'max-h-0')
         }
       >

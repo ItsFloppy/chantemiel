@@ -10,6 +10,16 @@ html {
   color-scheme: light;
   scrollbar-width: thin;
   scrollbar-color: rgba(231, 131, 0, 0.55) #FAF3E6;
+
+  /* Transparence du filigrane des titres de section (SectionLabel).
+     Réglable ici, indépendamment de la couleur qui reste pleine. */
+  --section-label-opacity: 0.5;
+}
+
+/* Filigrane SectionLabel : couleur honey-deep à pleine opacité,
+   transparence pilotée par la variable dédiée ci-dessus. */
+.section-label {
+  opacity: var(--section-label-opacity);
 }
 
 body {
