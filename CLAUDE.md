@@ -16,6 +16,12 @@ No online payment. Orders are sent via Formspree and Sophie follows up by email.
 - **Leaflet 1.9** — interactive map, client-only
 - **Formspree** — order form submission by email, optional
 
+## Deployment
+
+- **Live in production** on **Netlify** (config in `netlify.toml`).
+- Domain **`chantemiel.fr`** — purchased via **Hostinger**, DNS pointed at Netlify.
+- The canonical origin is hard-coded as `SITE_URL` in `lib/seo.ts` (`https://chantemiel.fr`) and reused by `metadataBase`, `robots.ts`, `sitemap.ts` and all JSON-LD. **Update `SITE_URL` if the domain ever changes.**
+
 ## Commands
 
 ```bash
@@ -124,38 +130,59 @@ Tiles: CARTO Voyager with a sepia filter (`filter: sepia(0.18) saturate(0.92)`) 
 
 Map pins use `L.divIcon` with CSS class `.pin-miel` (honey teardrop) or `.pin-miellerie` (dark circle). Active pin gets `.is-active` (scale + darker). All pin styles are in `globals.css`.
 
+### SEO
+
+All SEO is centralised around `SITE_URL` in `lib/seo.ts`.
+
+- **Metadata** — `app/layout.tsx` exports a full `Metadata`: `metadataBase`, title template, keywords (geo-targeted), canonical, `robots`, OpenGraph (`fr_FR`, 1200×630 image) and Twitter card. Page `<title>`/`<meta>` carry the keywords; on-page headings stay editorial.
+- **Generated routes** (Next.js file conventions): `app/robots.ts` (allows all, disallows `/studio`, declares sitemap), `app/sitemap.ts` (homepage + section anchors), `app/manifest.ts` (PWA), `app/icon.jpg` + `app/apple-icon.jpg` (favicons, copies of `logo.jpg`).
+- **Structured data (JSON-LD)** — `lib/seo.ts` builds it, `components/JsonLd.tsx` (server component) injects it in `page.tsx`:
+  - `buildLocalBusinessLd()` — `LocalBusiness`/`FoodEstablishment` (address, geo, tel, Ecocert credential) → Google local pack.
+  - `buildProductsLd(miels)` — one `Product` per honey, one `Offer` per format (price EUR, in/out of stock).
+  - `buildFaqLd()` — `FAQPage` from `FAQ_ITEMS` (same array feeds the visible `Faq.tsx` section, so copy stays in sync).
+- **`/studio` is `noindex`** — `app/studio/[[...tool]]/page.tsx` spreads `next-sanity/studio` metadata and overrides `robots: { index: false, follow: false }`.
+
+**Off-code SEO (not in repo, to be done by the owner):** Google Business Profile, Search Console + sitemap submission, local backlinks. These drive the local ranking more than anything in the code.
+
 ## File map
 
 ```
 app/
   globals.css               All CSS: Tailwind, scrollbars, animations, Leaflet overrides
-  layout.tsx                Fonts, CartProvider, metadata
-  page.tsx                  Server component, ISR, assembles all sections
+  layout.tsx                Fonts, CartProvider, full SEO metadata
+  page.tsx                  Server component, ISR, assembles all sections + <JsonLd />
+  robots.ts                 robots.txt (allow all, disallow /studio, sitemap ref)
+  sitemap.ts                sitemap.xml (homepage + section anchors)
+  manifest.ts               PWA web manifest
+  icon.jpg / apple-icon.jpg Favicons (copies of logo.jpg, file-based convention)
   studio/[[...tool]]/
-    page.tsx                Server shell (exports metadata)
+    page.tsx                Server shell, metadata + robots noindex
     StudioClient.tsx        'use client' NextStudio wrapper
 
 components/
   ui/
     BioBadge.tsx            Leaf SVG + "Certifié BIO · Ecocert" badge
     Reveal.tsx              IntersectionObserver fade-in (translateY 24px → 0)
-    SectionLabel.tsx        Great Vibes filigrane label, -translate-y-[130%], z-index -1
+    SectionLabel.tsx        Great Vibes filigrane label, -translate-y-[130%], z-index -1; opacity via --section-label-opacity
     StatutPastille.tsx      Sage dot "Dispo" / grey dot "Épuisé"
-  Header.tsx                Scroll-aware fixed nav, transparent → cream/95 on scroll, mobile burger
+  Header.tsx                Scroll-aware fixed nav, solid = scrolled || open, mobile burger
   Hero.tsx                  Full-bleed image, BioBadge, two CTAs
-  Valeurs.tsx               4 trust pillars, numbered 01–04
+  Valeurs.tsx               4 trust pillars; centered, numbers in honey ring, vertical dividers
   Catalogue.tsx             Honey card grid; stepper +/− per format; duochromie on sold-out
   BonDeCommande.tsx         Order form + cart recap; confetti on submit success
   CartFab.tsx               Floating cart button, spring animation, order panel overlay
   APropos.tsx               Sophie's story, portrait, italic quote, AB logo
   PointsDeVente.tsx         Leaflet map, 18 store pins, fly-to on list click
+  Faq.tsx                   FAQ section, copy sourced from FAQ_ITEMS in lib/seo.ts
   Footer.tsx                Contact, nav links, BioBadge, copyright
+  JsonLd.tsx                Server component injecting LocalBusiness + Product + FAQ JSON-LD
 
 lib/
   types.ts                  Miel, Format, PointDeVente, Contact, ClientInfo, Selection
   data.ts                   Static fallback: MIELS_STATIC, POINTS_DE_VENTE, MIELLERIE, CONTACT
   cart.tsx                  CartContext, CartProvider, useCart
   order.ts                  prixToNumber, panierTotaux, trouveItem, buildOrderBody
+  seo.ts                    SITE_URL, JSON-LD builders, FAQ_ITEMS
   sanity.client.ts          createClient + urlFor image builder
   sanity.queries.ts         getMiels() — Sanity or static fallback
 
@@ -181,6 +208,7 @@ Defined in `app/globals.css`:
 
 | Class | What it does |
 |---|---|
+| `section-label` | Filigrane opacity, driven by the `--section-label-opacity` CSS variable (default `0.5`) so the honey-deep color stays at full opacity |
 | `scroll-soft` | Honey-tinted thin scrollbar for lists |
 | `scroll-cart` | Dark-bg scrollbar for the order panel |
 | `fab-bump` | Scale pulse on cart badge count change |
