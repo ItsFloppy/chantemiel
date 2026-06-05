@@ -76,7 +76,7 @@ export function CartFab({ miels }: { miels: Miel[] }) {
 
   const wrapStyle: React.CSSProperties = {
     transition: 'transform .58s cubic-bezier(.18,1.9,.34,1), opacity .26s ease',
-    transform: visible ? 'translateY(0) scale(1) rotate(0deg)' : 'translateY(40px) scale(0) rotate(-160deg)',
+    transform: visible ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0)',
     opacity: visible ? 1 : 0,
     pointerEvents: visible ? 'auto' : 'none',
   }
@@ -108,27 +108,29 @@ export function CartFab({ miels }: { miels: Miel[] }) {
           <div
             className={
               (panelClosing ? 'cart-collapse' : 'cart-expand') +
-              ' scroll-cart absolute inset-x-3 bottom-3 max-h-[86vh] overflow-y-auto rounded-3xl bg-ink p-6 text-cream shadow-jar ring-1 ring-cream/10 sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-[440px] md:bottom-7 md:right-7'
+              ' absolute inset-x-3 bottom-3 max-h-[86vh] overflow-hidden rounded-3xl shadow-jar ring-1 ring-cream/10 sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-[440px] md:bottom-7 md:right-7'
             }
           >
-            <div className="mb-5 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <span className="grid h-9 w-9 place-items-center rounded-full bg-honey/15 text-honey">
-                  <CartIcon className="h-5 w-5" />
-                </span>
-                <h3 className="font-display text-xl text-cream">Votre bon de commande</h3>
+            <div className="scroll-cart max-h-[86vh] overflow-y-auto bg-ink p-6 text-cream">
+              <div className="mb-5 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <span className="grid h-9 w-9 place-items-center rounded-full bg-honey/15 text-honey">
+                    <CartIcon className="h-5 w-5" />
+                  </span>
+                  <h3 className="font-display text-xl text-cream">Votre bon de commande</h3>
+                </div>
+                <button
+                  onClick={() => setCartOpen(false)}
+                  aria-label="Fermer"
+                  className="grid h-9 w-9 place-items-center rounded-full text-cream/60 transition-colors hover:bg-cream/10 hover:text-cream"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-5 w-5">
+                    <path d="M6 6l12 12M18 6L6 18" />
+                  </svg>
+                </button>
               </div>
-              <button
-                onClick={() => setCartOpen(false)}
-                aria-label="Fermer"
-                className="grid h-9 w-9 place-items-center rounded-full text-cream/60 transition-colors hover:bg-cream/10 hover:text-cream"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-5 w-5">
-                  <path d="M6 6l12 12M18 6L6 18" />
-                </svg>
-              </button>
+              <OrderForm miels={miels} stack />
             </div>
-            <OrderForm miels={miels} stack />
           </div>
         </div>
       )}

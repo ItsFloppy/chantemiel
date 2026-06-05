@@ -13,9 +13,9 @@ function CarteMiel({ miel }: { miel: Miel }) {
 
   return (
     <Reveal className="h-full">
-      <article className="group flex h-full flex-col overflow-hidden rounded-2xl bg-paper shadow-soft transition-all duration-500 hover:-translate-y-1 hover:shadow-jar">
+      <article className="group flex h-full flex-col overflow-hidden rounded-2xl bg-paper shadow-soft transition-all duration-500 hover:-translate-y-1 hover:shadow-jar transform-gpu">
         {/* Image zone — extends down over title/desc/notes */}
-        <div className="relative flex min-h-[21rem] flex-1 flex-col overflow-hidden">
+        <div className="relative flex min-h-[21rem] flex-1 flex-col overflow-hidden rounded-t-2xl will-change-transform">
           <Image
             src={miel.image}
             alt={`Pot de ${miel.nom}`}
