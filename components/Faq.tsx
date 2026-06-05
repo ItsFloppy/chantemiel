@@ -5,7 +5,7 @@ import { FAQ_ITEMS } from '@/lib/seo'
 export function Faq() {
   return (
     <section id="faq" className="scroll-mt-20 bg-cream">
-      <div className="mx-auto max-w-3xl px-5 py-16 md:px-10 md:py-24">
+      <div className="mx-auto max-w-3xl px-5 pb-16 pt-24 md:px-10 md:pb-24 md:pt-32">
         <div className="mb-10 md:mb-14">
           <SectionLabel>Questions fréquentes</SectionLabel>
           <h2 className="mt-4 font-display text-4xl leading-tight text-ink md:text-5xl">

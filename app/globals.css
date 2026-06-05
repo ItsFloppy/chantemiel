@@ -13,7 +13,7 @@ html {
 
   /* Transparence du filigrane des titres de section (SectionLabel).
      Réglable ici, indépendamment de la couleur qui reste pleine. */
-  --section-label-opacity: 0.5;
+  --section-label-opacity: 0.7;
 }
 
 /* Filigrane SectionLabel : couleur honey-deep à pleine opacité,
