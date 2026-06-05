@@ -1,0 +1,236 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import 'leaflet/dist/leaflet.css';
+
+html {
+  scroll-behavior: smooth;
+  background-color: #FAF3E6;
+  color-scheme: light;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(231, 131, 0, 0.55) #FAF3E6;
+}
+
+body {
+  overflow-x: clip;
+  background-color: #FAF3E6;
+}
+
+::selection {
+  background: #E78300;
+  color: #fff;
+}
+
+/* ── Scrollbar page + listes ── */
+html::-webkit-scrollbar,
+.scroll-soft::-webkit-scrollbar { width: 8px; height: 8px; }
+html::-webkit-scrollbar-track,
+.scroll-soft::-webkit-scrollbar-track { background: #FAF3E6; }
+html::-webkit-scrollbar-thumb,
+.scroll-soft::-webkit-scrollbar-thumb {
+  background-color: rgba(231, 131, 0, 0.5);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+html::-webkit-scrollbar-thumb:hover,
+.scroll-soft::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(231, 131, 0, 0.85);
+}
+.scroll-soft {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(231, 131, 0, 0.55) #FAF3E6;
+}
+
+/* ── Scrollbar popup bon de commande ── */
+.scroll-cart {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(231, 131, 0, 0.6) #2A1C0E;
+}
+.scroll-cart::-webkit-scrollbar { width: 8px; }
+.scroll-cart::-webkit-scrollbar-track {
+  background: #2A1C0E;
+  border-radius: 9999px;
+  margin: 24px 0;
+}
+.scroll-cart::-webkit-scrollbar-thumb {
+  background-color: rgba(231, 131, 0, 0.55);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.scroll-cart::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(231, 131, 0, 0.9);
+}
+
+/* ── Cart FAB animations ── */
+@keyframes fabBump {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.22); }
+  70%  { transform: scale(0.94); }
+  100% { transform: scale(1); }
+}
+.fab-bump { animation: fabBump 0.34s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+@keyframes cartExpand {
+  0%   { opacity: 0; transform: translateY(18px) scale(0.82); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.cart-expand {
+  animation: cartExpand 0.42s cubic-bezier(0.34, 1.7, 0.5, 1);
+  transform-origin: bottom right;
+}
+
+@keyframes cartCollapse {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(18px) scale(0.82); }
+}
+.cart-collapse {
+  animation: cartCollapse 0.34s cubic-bezier(0.5, 0, 0.66, -0.2) forwards;
+  transform-origin: bottom right;
+}
+
+@keyframes backdropIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes backdropOut { from { opacity: 1; } to { opacity: 0; } }
+.backdrop-in  { animation: backdropIn  0.25s ease; }
+.backdrop-out { animation: backdropOut 0.3s  ease forwards; }
+
+/* ── Stepper catalogue (+ → −N+) ── */
+.stepper-collapse {
+  max-width: 0;
+  opacity: 0;
+  transform: scale(0.3);
+  overflow: hidden;
+  pointer-events: none;
+  transition:
+    max-width   0.3s cubic-bezier(0.34, 1.6, 0.6, 1),
+    opacity     0.22s ease,
+    transform   0.3s cubic-bezier(0.34, 1.6, 0.6, 1),
+    margin      0.3s ease;
+}
+.stepper-collapse.open {
+  max-width: 1.75rem;
+  opacity: 1;
+  transform: scale(1);
+  margin-right: 0.375rem;
+  pointer-events: auto;
+}
+.stepper-num {
+  display: inline-block;
+  width: 0;
+  opacity: 0;
+  transform: scale(0.5);
+  overflow: hidden;
+  text-align: center;
+  transition:
+    width     0.3s cubic-bezier(0.34, 1.6, 0.6, 1),
+    opacity   0.22s ease,
+    transform 0.3s cubic-bezier(0.34, 1.6, 0.6, 1),
+    margin    0.3s ease;
+}
+.stepper-num.open {
+  width: 1.25rem;
+  opacity: 1;
+  transform: scale(1);
+  margin-right: 0.375rem;
+}
+
+/* ── Confetti "Merci" ── */
+@keyframes merciCheckPop {
+  0%   { opacity: 0; transform: scale(0) rotate(-25deg); }
+  55%  { opacity: 1; transform: scale(1.18) rotate(8deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+@keyframes merciRise {
+  0%   { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes merciConfetti {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.2) rotate(0); }
+  14%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1) rotate(var(--rot)); }
+}
+@keyframes merciShine {
+  0%   { transform: translateX(-130%) skewX(-20deg); }
+  100% { transform: translateX(240%) skewX(-20deg); }
+}
+
+.merci-check { animation: merciCheckPop 0.6s cubic-bezier(0.34, 1.7, 0.5, 1) both; }
+.merci-item  { animation: merciRise 0.55s cubic-bezier(0.16, 0.84, 0.44, 1) both; }
+.merci-confetti {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  animation: merciConfetti 1s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+.merci-shine {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 3.5rem;
+  height: 3.5rem;
+  transform: translate(-50%, -50%);
+  border-radius: 9999px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 20;
+}
+.merci-shine::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+  animation: merciShine 1s ease-in-out 0.35s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .merci-check,
+  .merci-item,
+  .merci-confetti,
+  .merci-shine::before {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ── Leaflet map overrides ── */
+#carte-pdv { background: #f3ead4; }
+#carte-pdv .leaflet-tile-pane {
+  filter: sepia(0.18) saturate(0.92) brightness(1.02);
+}
+.leaflet-container { background: #f3ead4; }
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  box-shadow: 0 18px 50px -28px rgba(42, 28, 14, 0.6);
+  border: 1px solid rgba(231, 131, 0, 0.25);
+}
+.leaflet-popup-content { margin: 12px 14px; }
+.leaflet-popup-tip { box-shadow: none; }
+.leaflet-bar a { color: #2A1C0E; }
+
+.pin-miel {
+  width: 26px;
+  height: 26px;
+  background: #E78300;
+  border: 3px solid #FFFCF5;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  box-shadow: 0 6px 14px -4px rgba(42, 28, 14, 0.6);
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+.pin-miel.is-active {
+  background: #C96A00;
+  transform: rotate(-45deg) scale(1.35);
+  z-index: 1000;
+}
+.pin-miellerie {
+  background: #2A1C0E;
+  width: 30px;
+  height: 30px;
+}
