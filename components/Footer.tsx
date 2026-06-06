@@ -10,7 +10,7 @@ export function Footer() {
           <div>
             <span className="font-hand text-4xl text-honey">Chantemiel</span>
             <p className="mt-3 max-w-xs font-body text-sm leading-relaxed text-cream/60">
-              Miels de Provence certifiés BIO, récoltés et mis en pot à la main par
+              Miels certifiés BIO, récoltés en Provence et mis en pot à la main par
               une apicultrice passionnée.
             </p>
             <BioBadge className="mt-5" />

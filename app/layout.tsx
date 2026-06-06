@@ -26,19 +26,19 @@ const greatVibes = Great_Vibes({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Chantemiel — Miel bio de Provence | Apicultrice à L’Isle-sur-la-Sorgue (Vaucluse)',
+    default: 'Chantemiel — Miel bio du Luberon | Apicultrice à L’Isle-sur-la-Sorgue, en Provence',
     template: '%s · Chantemiel',
   },
   description:
-    "Sophie Mus, apicultrice récoltante certifiée BIO Ecocert dans le Vaucluse. Six miels de Provence — lavande, romarin, châtaignier, acacia — récoltés et mis en pot à froid. Vente directe et points de vente en Vaucluse et Bouches-du-Rhône.",
+    "Sophie Mus, apicultrice récoltante certifiée BIO Ecocert dans le Vaucluse. Six miels — lavande, romarin, châtaignier, acacia — récoltés en Provence et mis en pot à froid. Vente directe et points de vente en Vaucluse et Bouches-du-Rhône.",
   keywords: [
     'miel bio',
     'miel bio Vaucluse',
-    'miel bio Provence',
+    'miel bio Luberon',
     'apiculteur bio',
     "apicultrice L'Isle-sur-la-Sorgue",
     'miel de lavande bio',
-    'miel de Provence',
+    'miel de romarin',
     'miel Luberon',
     'Chantemiel',
     'Sophie Mus',
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
     locale: 'fr_FR',
     url: SITE_URL,
     siteName: 'Chantemiel',
-    title: 'Chantemiel — Miel bio de Provence, récolté à L’Isle-sur-la-Sorgue',
+    title: 'Chantemiel — Miel bio du Luberon, récolté à L’Isle-sur-la-Sorgue',
     description:
       "Six miels d'exception récoltés à la main en Provence par Sophie Mus, certifiés Agriculture Biologique (Ecocert).",
     images: [
@@ -80,9 +80,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Chantemiel — Miel bio de Provence',
+    title: 'Chantemiel — Miel bio du Luberon',
     description:
-      'Six miels de Provence certifiés BIO Ecocert, récoltés par Sophie Mus dans le Vaucluse.',
+      'Six miels certifiés BIO Ecocert, récoltés en Provence par Sophie Mus, dans le Vaucluse.',
     images: ['/images/pyramide-pots.jpg'],
   },
 }

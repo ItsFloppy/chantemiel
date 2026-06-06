@@ -9,7 +9,7 @@ const business = {
   name: 'Chantemiel',
   legalName: 'Chantemiel — Sophie Mus',
   description:
-    "Miellerie certifiée Agriculture Biologique de Sophie Mus, apicultrice récoltante à L'Isle-sur-la-Sorgue (Vaucluse). Six miels de Provence récoltés et mis en pot à froid, sans antibiotique ni répulsif.",
+    "Miellerie certifiée Agriculture Biologique de Sophie Mus, apicultrice récoltante à L'Isle-sur-la-Sorgue (Vaucluse). Six miels récoltés en Provence et mis en pot à froid, sans antibiotique ni répulsif.",
   street: '315 Hameau Petit Palais',
   postalCode: '84800',
   city: "L'Isle-sur-la-Sorgue",
@@ -58,7 +58,7 @@ export function buildLocalBusinessLd() {
       credentialCategory: 'Agriculture Biologique',
       recognizedBy: { '@type': 'Organization', name: 'Ecocert' },
     },
-    knowsAbout: ['Miel bio', 'Apiculture biologique', 'Miel de lavande', 'Miel de Provence'],
+    knowsAbout: ['Miel bio', 'Apiculture biologique', 'Miel de lavande', 'Miel du Luberon'],
   }
 }
 
