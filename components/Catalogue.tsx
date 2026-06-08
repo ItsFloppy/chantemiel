@@ -168,8 +168,8 @@ export function Catalogue({ miels }: { miels: Miel[] }) {
               leur disponibilité varient au fil de l&apos;année. Le statut de chaque format
               est tenu à jour. »
             </blockquote>
-            <figcaption className="mt-3 flex items-center gap-2 font-body text-sm font-semibold text-honey-deep">
-              <span className="h-px w-6 bg-honey-deep/50" /> Sophie, votre apicultrice
+            <figcaption className="mt-3 font-body text-sm font-semibold text-honey-deep">
+              Sophie, votre apicultrice
             </figcaption>
           </figure>
         </div>

@@ -64,7 +64,7 @@ export function APropos() {
                   transhumances, récoltes, extractions, mise en pots. »
                 </blockquote>
                 <figcaption className="mt-2 font-body text-sm font-semibold uppercase tracking-wider text-ink-soft">
-                  Sophie Mus — Apicultrice récoltante
+                  Sophie Mus, apicultrice récoltante
                 </figcaption>
               </figure>
             </Reveal>
