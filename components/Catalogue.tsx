@@ -4,11 +4,14 @@ import Image from 'next/image'
 import { useCart } from '@/lib/cart'
 import { SectionLabel } from './ui/SectionLabel'
 import { StatutPastille } from './ui/StatutPastille'
+import { ClientTypeToggle } from './ui/ClientTypeToggle'
 import { Reveal } from './ui/Reveal'
+import { prixFormat } from '@/lib/order'
 import type { Miel } from '@/lib/types'
 
 function CarteMiel({ miel }: { miel: Miel }) {
-  const { selection, onAdd, onRemove } = useCart()
+  const { selection, clientType, onAdd, setQte } = useCart()
+  const pro = clientType === 'entreprise'
   const tousEpuises = miel.formats.every(f => !f.disponible)
 
   return (
@@ -96,11 +99,12 @@ function CarteMiel({ miel }: { miel: Miel }) {
           </div>
         </div>
 
-        {/* Fond uni — formats et steppers */}
+        {/* Fond uni — formats et compteurs */}
         <div className="flex flex-col gap-1 bg-paper p-4">
           {miel.formats.map(f => {
             const key = `${miel.id}__${f.poids}`
             const qte = selection[key] || 0
+            const prixAff = prixFormat(f, clientType)
             return (
               <div
                 key={f.poids}
@@ -114,39 +118,78 @@ function CarteMiel({ miel }: { miel: Miel }) {
                     {f.poids}
                   </span>
                   <span className={'whitespace-nowrap font-body text-sm font-semibold ' + (f.disponible ? 'text-honey-deep' : 'text-ink/30 line-through')}>
-                    {f.prix}
+                    {prixAff}
+                    {pro && <span className="ml-1 text-[11px] font-medium text-ink/45">HT</span>}
                   </span>
                 </div>
 
                 <div className="flex items-center">
                   <StatutPastille disponible={f.disponible} />
                   {f.disponible && (
-                    <div className="ml-3 flex items-center">
-                      <button
-                        onClick={() => onRemove(miel, f.poids)}
-                        className={'stepper-collapse grid h-7 w-7 place-items-center rounded-full border border-honey/40 font-body text-base font-bold leading-none text-honey-deep transition-colors hover:bg-honey hover:text-white' + (qte > 0 ? ' open' : '')}
-                        aria-label={`Retirer ${miel.nom} ${f.poids}`}
-                        tabIndex={qte > 0 ? 0 : -1}
-                      >
-                        −
-                      </button>
-                      <span className={'stepper-num font-body text-sm font-bold text-ink' + (qte > 0 ? ' open' : '')}>{qte}</span>
+                    qte > 0 ? (
+                      <div className="ml-3 flex items-center gap-1">
+                        <button
+                          onClick={() => setQte(miel, f.poids, qte - 1)}
+                          className="grid h-7 w-7 place-items-center rounded-full border border-honey/40 font-body text-base font-bold leading-none text-honey-deep transition-colors hover:bg-honey hover:text-white"
+                          aria-label={`Retirer ${miel.nom} ${f.poids}`}
+                        >
+                          −
+                        </button>
+                        <input
+                          type="number"
+                          min={0}
+                          inputMode="numeric"
+                          value={qte}
+                          onChange={e => setQte(miel, f.poids, parseInt(e.target.value, 10))}
+                          onFocus={e => e.target.select()}
+                          className="qte-input h-7 w-11 border-b-2 border-honey/40 bg-transparent text-center font-body text-sm font-bold text-ink outline-none transition-colors hover:border-honey/70 focus:border-honey"
+                          aria-label={`Quantité ${miel.nom} ${f.poids}`}
+                        />
+                        <button
+                          onClick={() => setQte(miel, f.poids, qte + 1)}
+                          className="grid h-7 w-7 place-items-center rounded-full bg-honey font-body text-base font-bold leading-none text-white transition-all hover:bg-honey-deep"
+                          aria-label={`Ajouter ${miel.nom} ${f.poids}`}
+                        >
+                          +
+                        </button>
+                      </div>
+                    ) : (
                       <button
                         onClick={() => onAdd(miel, f.poids)}
-                        className="grid h-7 w-7 place-items-center rounded-full bg-honey font-body text-base font-bold leading-none text-white transition-all hover:bg-honey-deep"
+                        className="ml-3 grid h-7 w-7 place-items-center rounded-full bg-honey font-body text-base font-bold leading-none text-white transition-all hover:bg-honey-deep"
                         aria-label={`Ajouter ${miel.nom} ${f.poids}`}
                       >
                         +
                       </button>
-                    </div>
+                    )
                   )}
                 </div>
               </div>
             )
           })}
+          {pro && (
+            <p className="mt-1 px-3 font-body text-[11px] leading-snug text-ink-soft/70">
+              Tarif pro HT · à l&apos;unité ou par carton de 12 pots
+            </p>
+          )}
         </div>
       </article>
     </Reveal>
+  )
+}
+
+function ClientTypeBanner() {
+  const { clientType } = useCart()
+  return (
+    <div className="mb-10 flex flex-col items-start gap-2.5 md:mb-12">
+      <span className="font-body text-sm text-ink-soft">Vous commandez en tant que</span>
+      <ClientTypeToggle tone="light" />
+      <p className="font-body text-xs text-ink-soft/75">
+        {clientType === 'entreprise'
+          ? 'Prix HT · à l’unité ou par carton de 12 · sans frais de port'
+          : 'Prix TTC · livraison en option (frais de port La Poste à votre charge)'}
+      </p>
+    </div>
   )
 }
 
@@ -173,6 +216,8 @@ export function Catalogue({ miels }: { miels: Miel[] }) {
             </figcaption>
           </figure>
         </div>
+
+        <ClientTypeBanner />
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {miels.map(m => (

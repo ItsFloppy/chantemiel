@@ -56,7 +56,8 @@ export const miel = defineType({
           name: 'format',
           fields: [
             { name: 'poids', title: 'Poids', type: 'string' },
-            { name: 'prix', title: 'Prix', type: 'string' },
+            { name: 'prix', title: 'Prix particulier (TTC)', type: 'string' },
+            { name: 'prixPro', title: 'Prix entreprise / pot (HT)', type: 'string' },
             {
               name: 'disponible',
               title: 'Disponible',

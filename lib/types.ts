@@ -1,8 +1,14 @@
 export interface Format {
   poids: string
+  /** Prix particulier, TTC (ex. "6,50 €"). */
   prix: string
+  /** Prix entreprise par pot, HT (ex. "5,56 €"). Optionnel : fallback sur `prix`. */
+  prixPro?: string
   disponible: boolean
 }
+
+/** Type de client : particulier (prix TTC, livraison possible) ou entreprise (prix HT, cartons de 12). */
+export type ClientType = 'particulier' | 'entreprise'
 
 export interface Miel {
   id: string
@@ -37,7 +43,13 @@ export interface ClientInfo {
   nom: string
   email: string
   tel: string
-  adresse: string
+  // Adresse structurée (standard postal FR)
+  adresseNumero: string
+  adresseRue: string
+  codePostal: string
+  ville: string
+  // Entreprise uniquement
+  siret: string
   message: string
 }
 

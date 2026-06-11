@@ -36,5 +36,8 @@ yarn-error.log*
 *.pem
 design_archive/
 
+# Internal pricing reference — never commit
+docs/facture-biosphere.md
+
 # Raw video masters — only the compressed .mp4/.webm derivatives are committed
 public/images/*.mov

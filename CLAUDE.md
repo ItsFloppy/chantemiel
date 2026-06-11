@@ -97,18 +97,28 @@ app/page.tsx (server component)
 
 `CartProvider` (in `app/layout.tsx`) exposes:
 - `selection: Selection` — `Record<"mielId__poids", quantity>`
-- `client: ClientInfo` — form fields (nom, email, tel, adresse, message)
+- `client: ClientInfo` — form fields (nom, email, tel, adresseNumero, adresseRue, codePostal, ville, siret, message)
+- `clientType: 'particulier' | 'entreprise'` — drives pricing (TTC vs HT) across catalogue + order form; **persists** across submit (not reset)
+- `livraison: boolean` — particulier delivery toggle; adds La Poste shipping fee to the total
 - `envoye`, `erreur`, `cartOpen` — UI state
-- `onAdd(miel, poids)` / `onRemove(miel, poids)` — mutate selection
-- `submitOrder(e, miels)` — Formspree POST; takes `miels` as argument (not stored in context)
+- `onAdd(miel, poids)` / `onRemove(miel, poids)` — increment/decrement selection
+- `setQte(miel, poids, q)` — set an exact quantity (used by the catalogue number input); clamps to integers ≥ 0
+- `resetClient()` — clears `client` + `livraison` (called after a successful submit)
+- `submitOrder(e, miels)` — Formspree POST; takes `miels` as argument (not stored in context). Reads `clientType` + `livraison` from context; blocks particulier delivery > 5 kg and requires SIRET in entreprise mode
 
 Cart key format: `"fleurs-luberon__500g"` (miel id + `__` + poids string).
+
+### Pricing & shipping (particulier vs entreprise)
+
+- **Particulier** — `prix` (TTC). Optional postal delivery (`livraison`) adds **frais de port** to the customer's charge per `fraisLivraison()`: ≤ 3 kg → 18,00 € · 3–5 kg → 24,50 € · > 5 kg → not shippable (blocked). Weight from `poidsToGrammes()` summed over the cart.
+- **Entreprise** — `prixPro` (HT, per pot, from the Biosphère invoice — see gitignored `docs/facture-biosphere.md`). Sold à l'unité or by carton of 12 (`POTS_PAR_CARTON`). Recap shows sous-total HT + TVA 5,5 % (`TVA_PRO`) + total TTC and the carton breakdown. No frais de port (transport arranged directly). SIRET required.
+- `prixFormat(format, type)` returns the right price string; `panierTotaux(selection, miels, type)` returns `{ lignes, totalArticles, totalPrix, poidsGrammes }`.
 
 ### Sanity
 
 - Client: `lib/sanity.client.ts` — `sanityClient` + `urlFor()` image builder
 - Queries: `lib/sanity.queries.ts` — `getMiels()` with `{ next: { revalidate: 60 } }`
-- Schema: `sanity/schemaTypes/miel.ts` — `id` (slug), `nom`, `image` (with hotspot), `saison`, `terroir`, `description`, `notes[]`, `formats[]` (poids/prix/disponible), `ordre`
+- Schema: `sanity/schemaTypes/miel.ts` — `id` (slug), `nom`, `image` (with hotspot), `saison`, `terroir`, `description`, `notes[]`, `formats[]` (poids/prix/prixPro/disponible), `ordre`
 - Embedded studio at `/studio` — `app/studio/[[...tool]]/page.tsx` (server) + `StudioClient.tsx` (`'use client'`)
 - Config: `sanity.config.ts` — `structureTool` + `visionTool`
 
@@ -165,11 +175,12 @@ components/
     Reveal.tsx              IntersectionObserver fade-in (translateY 24px → 0)
     SectionLabel.tsx        Great Vibes filigrane label, -translate-y-[130%], z-index -1; opacity via --section-label-opacity
     StatutPastille.tsx      Sage dot "Dispo" / grey dot "Épuisé"
+    ClientTypeToggle.tsx    Particulier / Entreprise segmented control; drives clientType in cart (tone light|dark)
   Header.tsx                Scroll-aware fixed nav, solid = scrolled || open, mobile burger
   Hero.tsx                  Full-bleed autoplay video (BeeOnLavender), poster fallback, BioBadge, two CTAs
   Valeurs.tsx               4 trust pillars; centered, numbers in honey ring, vertical dividers
-  Catalogue.tsx             Honey card grid; stepper +/− per format; duochromie on sold-out
-  BonDeCommande.tsx         Order form + cart recap; confetti on submit success
+  Catalogue.tsx             Honey card grid; Particulier/Entreprise toggle; qty = input number + −/+ buttons; mode-aware pricing; duochromie on sold-out
+  BonDeCommande.tsx         Order form + cart recap; structured address, SIRET (pro), delivery checkbox (particulier), HT/TVA/TTC vs frais de port; confetti on submit success
   CartFab.tsx               Floating cart button, spring animation, order panel overlay
   APropos.tsx               Sophie's story, portrait, italic quote, AB logo
   PointsDeVente.tsx         Leaflet map, 18 store pins, fly-to on list click
@@ -178,10 +189,10 @@ components/
   JsonLd.tsx                Server component injecting LocalBusiness + Product + FAQ JSON-LD
 
 lib/
-  types.ts                  Miel, Format, PointDeVente, Contact, ClientInfo, Selection
-  data.ts                   Static fallback: MIELS_STATIC, POINTS_DE_VENTE, MIELLERIE, CONTACT
-  cart.tsx                  CartContext, CartProvider, useCart
-  order.ts                  prixToNumber, panierTotaux, trouveItem, buildOrderBody
+  types.ts                  Miel, Format (prix + prixPro), ClientType, PointDeVente, Contact, ClientInfo, Selection
+  data.ts                   Static fallback: MIELS_STATIC (prix + prixPro), POINTS_DE_VENTE, MIELLERIE, CONTACT
+  cart.tsx                  CartContext, CartProvider, useCart (clientType, livraison, setQte, resetClient)
+  order.ts                  prixToNumber, poidsToGrammes, prixFormat, fraisLivraison, formatEuro, panierTotaux, trouveItem, buildOrderBody; consts TVA_PRO, POTS_PAR_CARTON, FRAIS_PORT
   seo.ts                    SITE_URL, JSON-LD builders, FAQ_ITEMS
   sanity.client.ts          createClient + urlFor image builder
   sanity.queries.ts         getMiels() — Sanity or static fallback
@@ -215,7 +226,8 @@ Defined in `app/globals.css`:
 | `fab-bump` | Scale pulse on cart badge count change |
 | `cart-expand` / `cart-collapse` | Spring in / ease out for order panel |
 | `backdrop-in` / `backdrop-out` | Fade in/out for the overlay backdrop |
-| `stepper-collapse` / `.open` | Animated reveal of the − button in catalogue steppers |
+| `qte-input` | Catalogue quantity `<input type=number>` — hides the native spin buttons |
+| `stepper-collapse` / `.open` | (legacy) Animated reveal of the − button; superseded by the number input |
 | `stepper-num` / `.open` | Animated reveal of the quantity number |
 | `merci-check`, `merci-item`, `merci-confetti`, `merci-shine` | Post-submit success animation |
 | `pin-miel`, `pin-miellerie`, `.is-active` | Leaflet map pin styles |
@@ -237,3 +249,5 @@ Defined in `app/globals.css`:
 - **Certification**: Agriculture Biologique, certified by **Ecocert**
 - 6 honey varieties: Fleurs du Luberon, Châtaignier, Lavande, Bruyère Blanche, Acacia, Romarin
 - 18 retail points of sale across Vaucluse, Bouches-du-Rhône
+- **Wholesale (entreprise) prices** — HT, from the Biosphère invoice (kept in gitignored `docs/facture-biosphere.md`). Two tiers: low (Fleurs du Luberon, Châtaignier) `5,56 / 9,11 / 17,01 €`; high (Lavande, Bruyère, Acacia) `6,09 / 10,54 / 17,94 €`; Romarin ≈ high +0,02/0,03 € (`6,12 / 10,56 / 17,96 €`). Honey TVA = **5,5 %**. Cartons of 12.
+- **Shipping (frais de port, particulier)** — customer's charge, La Poste rates: ≤ 3 kg → 18,00 € · 3–5 kg → 24,50 € · no postal delivery > 5 kg.

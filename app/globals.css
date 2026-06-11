@@ -146,6 +146,17 @@ html::-webkit-scrollbar-thumb:hover,
   margin-right: 0.375rem;
 }
 
+/* ── Compteur quantité (input number sans flèches natives) ── */
+.qte-input::-webkit-outer-spin-button,
+.qte-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.qte-input {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 /* ── Confetti "Merci" ── */
 @keyframes merciCheckPop {
   0%   { opacity: 0; transform: scale(0) rotate(-25deg); }

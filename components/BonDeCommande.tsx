@@ -1,9 +1,19 @@
 'use client'
 
+import { useEffect } from 'react'
 import Image from 'next/image'
 import { useCart } from '@/lib/cart'
 import { SectionLabel } from './ui/SectionLabel'
-import { panierTotaux, trouveItem } from '@/lib/order'
+import { ClientTypeToggle } from './ui/ClientTypeToggle'
+import {
+  POTS_PAR_CARTON,
+  TVA_PRO,
+  formatEuro,
+  fraisLivraison,
+  panierTotaux,
+  prixFormat,
+  trouveItem,
+} from '@/lib/order'
 import type { Miel } from '@/lib/types'
 
 const MERCI_PALETTE = ['#E78300', '#C96A00', '#7A7F52', '#E7B36A', '#FAF3E6']
@@ -23,15 +33,63 @@ const MERCI_CONFETTI = Array.from({ length: 18 }, (_, i) => {
 
 const CHAMP = 'w-full rounded-xl border border-cream/15 bg-cream/[0.06] px-4 py-3 font-body text-sm text-cream placeholder-cream/40 outline-none transition-colors focus:border-honey focus:bg-cream/10 focus:ring-2 focus:ring-honey/20'
 
+/** Message discret (erreur / avertissement) : accent honey à gauche, icône, texte adouci. */
+function Alerte({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="flex items-start gap-2.5 rounded-lg border-l-2 border-honey bg-honey/[0.07] py-2 pl-3 pr-3 font-body text-[13px] leading-snug text-cream/85">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-[2px] h-4 w-4 flex-shrink-0 text-honey">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 8v4" />
+        <path d="M12 16h.01" />
+      </svg>
+      <span>{children}</span>
+    </p>
+  )
+}
+
 export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boolean }) {
-  const { selection, setSelection, client, setClient, envoye, setEnvoye, erreur, submitOrder } = useCart()
-  const { lignes, totalArticles, totalPrix } = panierTotaux(selection, miels)
+  const {
+    selection,
+    setSelection,
+    client,
+    setClient,
+    clientType,
+    livraison,
+    setLivraison,
+    envoye,
+    setEnvoye,
+    resetClient,
+    erreur,
+    submitOrder,
+  } = useCart()
+  const pro = clientType === 'entreprise'
+  const { lignes, totalArticles, totalPrix, poidsGrammes } = panierTotaux(selection, miels, clientType)
+
+  const poidsKg = poidsGrammes / 1000
+  const cartonsPleins = Math.floor(totalArticles / POTS_PAR_CARTON)
+  const reste = totalArticles % POTS_PAR_CARTON
+  const cartonLabel =
+    totalArticles < POTS_PAR_CARTON
+      ? 'moins d’un carton'
+      : `${cartonsPleins} carton${cartonsPleins > 1 ? 's' : ''} de 12${reste ? ` + ${reste} pot${reste > 1 ? 's' : ''}` : ''}`
+
+  // Livraison impossible dès que le panier dépasse le poids max (indépendant de la case cochée).
+  const livraisonImpossible = !pro && fraisLivraison(poidsGrammes) === null
+  const tva = pro ? totalPrix * TVA_PRO : 0
+  const port = !pro && livraison ? fraisLivraison(poidsGrammes) : 0
+  const totalFinal = pro ? totalPrix + tva : totalPrix + (port && port > 0 ? port : 0)
+
+  // Si le panier passe au-dessus de 5 kg alors que la livraison est cochée, on la décoche.
+  useEffect(() => {
+    if (livraisonImpossible && livraison) setLivraison(false)
+  }, [livraisonImpossible, livraison, setLivraison])
 
   function setQte(key: string, q: number) {
     setSelection(prev => {
       const next = { ...prev }
-      if (q <= 0) delete next[key]
-      else next[key] = q
+      const n = Number.isFinite(q) ? Math.max(0, Math.floor(q)) : 0
+      if (n <= 0) delete next[key]
+      else next[key] = n
       return next
     })
   }
@@ -71,7 +129,7 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
           à l&apos;adresse <span className="text-honey">{client.email || 'votre e-mail'}</span>.
         </p>
         <button
-          onClick={() => { setEnvoye(false); setSelection({}); setClient({ nom: '', email: '', tel: '', adresse: '', message: '' }) }}
+          onClick={() => { setEnvoye(false); setSelection({}); resetClient() }}
           className="merci-item mt-7 rounded-full border border-cream/30 px-6 py-2.5 font-body text-sm font-semibold text-cream transition-colors hover:bg-cream/10"
           style={{ animationDelay: '.22s' }}
         >
@@ -82,10 +140,14 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
   }
 
   return (
-    <form
-      onSubmit={e => submitOrder(e, miels)}
-      className={'grid gap-8 ' + (stack ? '' : 'lg:grid-cols-[1fr_1.1fr] lg:gap-12')}
-    >
+    <form onSubmit={e => submitOrder(e, miels)} className="flex flex-col gap-8">
+      {/* Type de client */}
+      <div className="flex flex-col items-start gap-2.5">
+        <span className="font-body text-sm text-cream/60">Je commande en tant que</span>
+        <ClientTypeToggle tone="dark" />
+      </div>
+
+      <div className={'grid gap-8 ' + (stack ? '' : 'lg:grid-cols-[1fr_1.1fr] lg:gap-12')}>
       {/* Récapitulatif panier */}
       <div className={stack ? 'order-1' : 'order-2 lg:order-1'}>
         <h3 className="font-display text-xl text-cream">Votre panier</h3>
@@ -107,11 +169,22 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
                     <Image src={miel.image} alt="" width={48} height={48} className="h-12 w-12 flex-shrink-0 rounded-lg object-cover" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-body text-sm font-semibold text-cream">{miel.nom}</p>
-                      <p className="font-body text-xs text-cream/55">{format.poids} · {format.prix}</p>
+                      <p className="font-body text-xs text-cream/55">
+                        {format.poids} · {prixFormat(format, clientType)}{pro ? ' HT' : ''}
+                      </p>
                     </div>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1">
                       <button type="button" onClick={() => setQte(key, q - 1)} className="grid h-7 w-7 place-items-center rounded-full border border-cream/25 font-bold leading-none text-cream hover:bg-cream/10">−</button>
-                      <span className="w-5 text-center font-body text-sm font-bold text-cream">{q}</span>
+                      <input
+                        type="number"
+                        min={0}
+                        inputMode="numeric"
+                        value={q}
+                        onChange={e => setQte(key, parseInt(e.target.value, 10))}
+                        onFocus={e => e.target.select()}
+                        className="qte-input h-7 w-11 border-b-2 border-honey/40 bg-transparent text-center font-body text-sm font-bold text-cream outline-none transition-colors hover:border-honey/70 focus:border-honey"
+                        aria-label="Quantité"
+                      />
                       <button type="button" onClick={() => setQte(key, q + 1)} className="grid h-7 w-7 place-items-center rounded-full border border-cream/25 font-bold leading-none text-cream hover:bg-cream/10">+</button>
                     </div>
                   </li>
@@ -120,16 +193,45 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
             </ul>
           )}
           {lignes.length > 0 && (
-            <div className="mt-4 flex items-center justify-between border-t border-cream/10 pt-4">
-              <span className="font-body text-sm text-cream/60">{totalArticles} pot{totalArticles > 1 ? 's' : ''}</span>
-              <span className="font-body text-2xl font-semibold text-honey">
-                {totalPrix.toLocaleString('fr-FR', { minimumFractionDigits: 2 }).replace('.', ',')} €
-              </span>
+            <div className="mt-4 space-y-2 border-t border-cream/10 pt-4">
+              <div className="flex items-center justify-between font-body text-sm text-cream/60">
+                <span>{totalArticles} pot{totalArticles > 1 ? 's' : ''} · ≈ {poidsKg.toLocaleString('fr-FR', { maximumFractionDigits: 2 })} kg</span>
+                {pro && <span className="text-cream/50">{cartonLabel}</span>}
+              </div>
+
+              {pro ? (
+                <>
+                  <div className="flex items-center justify-between font-body text-sm text-cream/70">
+                    <span>Sous-total HT</span>
+                    <span>{formatEuro(totalPrix)}</span>
+                  </div>
+                  <div className="flex items-center justify-between font-body text-sm text-cream/70">
+                    <span>TVA 5,5 %</span>
+                    <span>{formatEuro(tva)}</span>
+                  </div>
+                </>
+              ) : livraison ? (
+                <div className="flex items-center justify-between font-body text-sm text-cream/70">
+                  <span>Frais de port</span>
+                  <span>{formatEuro(port || 0)}</span>
+                </div>
+              ) : null}
+
+              <div className="flex items-center justify-between border-t border-cream/10 pt-3">
+                <span className="font-body text-sm font-semibold text-cream">
+                  {pro ? 'Total TTC' : livraison ? 'Total à régler' : 'Total'}
+                </span>
+                <span className="font-body text-2xl font-semibold text-honey">
+                  {formatEuro(totalFinal)}
+                </span>
+              </div>
             </div>
           )}
         </div>
         <p className="mt-3 font-body text-xs leading-relaxed text-cream/40">
-          Montant indicatif, hors frais d&apos;envoi éventuels. Le règlement se fait après confirmation.
+          {pro
+            ? 'Prix HT, TVA 5,5 % incluse ci-dessus. Le transport est organisé directement avec Sophie. Le règlement se fait après confirmation.'
+            : 'Montant indicatif. Le règlement se fait après confirmation de la commande.'}
         </p>
       </div>
 
@@ -137,19 +239,67 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
       <div className={'flex flex-col gap-4 ' + (stack ? 'order-2' : 'order-1 lg:order-2')}>
         <h3 className="font-display text-xl text-cream">Vos coordonnées</h3>
         <div className="grid gap-4 sm:grid-cols-2">
-          <input className={CHAMP} placeholder="Nom et prénom *" value={client.nom} onChange={e => setClient({ ...client, nom: e.target.value })} />
+          <input className={CHAMP} placeholder={pro ? 'Contact / raison sociale *' : 'Nom et prénom *'} value={client.nom} onChange={e => setClient({ ...client, nom: e.target.value })} />
           <input className={CHAMP} type="email" placeholder="E-mail *" value={client.email} onChange={e => setClient({ ...client, email: e.target.value })} />
         </div>
-        <input className={CHAMP} placeholder="Téléphone" value={client.tel} onChange={e => setClient({ ...client, tel: e.target.value })} />
-        <input className={CHAMP} placeholder="Adresse de livraison" value={client.adresse} onChange={e => setClient({ ...client, adresse: e.target.value })} />
+        <input className={CHAMP} type="tel" inputMode="tel" placeholder="Téléphone" value={client.tel} onChange={e => setClient({ ...client, tel: e.target.value.replace(/[^\d+()\s.-]/g, '').slice(0, 20) })} />
+        {pro && (
+          <input
+            className={CHAMP}
+            inputMode="numeric"
+            maxLength={14}
+            placeholder="SIRET de l’entreprise (14 chiffres) *"
+            value={client.siret}
+            onChange={e => setClient({ ...client, siret: e.target.value.replace(/\D/g, '').slice(0, 14) })}
+          />
+        )}
+
+        {/* Adresse structurée */}
+        <div className="grid gap-3 sm:grid-cols-[110px_1fr]">
+          <input className={CHAMP} maxLength={8} placeholder="N° de voie" value={client.adresseNumero} onChange={e => setClient({ ...client, adresseNumero: e.target.value.slice(0, 8) })} />
+          <input className={CHAMP} placeholder="Nom de la rue" value={client.adresseRue} onChange={e => setClient({ ...client, adresseRue: e.target.value })} />
+        </div>
+        <div className="grid gap-3 sm:grid-cols-[150px_1fr]">
+          <input className={CHAMP} inputMode="numeric" maxLength={5} placeholder="Code postal" value={client.codePostal} onChange={e => setClient({ ...client, codePostal: e.target.value.replace(/\D/g, '').slice(0, 5) })} />
+          <input className={CHAMP} placeholder="Ville" value={client.ville} onChange={e => setClient({ ...client, ville: e.target.value })} />
+        </div>
+
+        {/* Livraison — particulier uniquement */}
+        {!pro && (
+          <label className={'flex items-start gap-3 ' + (livraisonImpossible ? 'cursor-not-allowed opacity-50' : 'cursor-pointer')}>
+            <span className="relative mt-0.5 grid h-5 w-5 flex-shrink-0 place-items-center">
+              <input
+                type="checkbox"
+                checked={livraison}
+                disabled={livraisonImpossible}
+                onChange={e => setLivraison(e.target.checked)}
+                className="peer h-5 w-5 appearance-none rounded-md border-2 border-honey/50 bg-transparent transition-colors checked:border-honey checked:bg-honey enabled:cursor-pointer enabled:hover:border-honey/80 disabled:cursor-not-allowed"
+              />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="pointer-events-none absolute h-3 w-3 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                <path d="M5 13l4 4L19 7" />
+              </svg>
+            </span>
+            <span className="font-body text-sm text-cream/85">
+              <span className="font-semibold text-cream">Je souhaite être livré·e par voie postale</span>
+              <span className="mt-1 block text-xs leading-relaxed text-cream/55">
+                Frais de port à votre charge (tarifs La Poste) : jusqu’à 3 kg → 18,00 € · de 3 à 5 kg → 24,50 €. Pas d’envoi postal au-delà de 5 kg.
+              </span>
+            </span>
+          </label>
+        )}
+        {livraisonImpossible && (
+          <Alerte>Votre panier dépasse 5 kg : la livraison postale n’est pas disponible. Contactez Sophie pour organiser le transport.</Alerte>
+        )}
+
         <textarea className={CHAMP + ' min-h-[96px] resize-y'} placeholder="Un mot pour Sophie (facultatif)" value={client.message} onChange={e => setClient({ ...client, message: e.target.value })} />
-        {erreur && <p className="font-body text-sm font-semibold text-honey">{erreur}</p>}
+        {erreur && <Alerte>{erreur}</Alerte>}
         <button type="submit" className="mt-1 rounded-full bg-honey px-7 py-3.5 font-body text-base font-bold text-white shadow-jar transition-colors hover:bg-honey-deep">
           Envoyer mon bon de commande
         </button>
         <p className="font-body text-xs text-cream/40">
           Vos informations ne servent qu&apos;à traiter votre commande. Aucun paiement n&apos;est demandé sur ce site.
         </p>
+      </div>
       </div>
     </form>
   )
