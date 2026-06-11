@@ -6,8 +6,8 @@ import { useCart } from '@/lib/cart'
 import { SectionLabel } from './ui/SectionLabel'
 import { ClientTypeToggle } from './ui/ClientTypeToggle'
 import {
-  POTS_PAR_CARTON,
   TVA_PRO,
+  cartonLabel,
   formatEuro,
   fraisLivraison,
   panierTotaux,
@@ -58,6 +58,7 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
     setLivraison,
     envoye,
     setEnvoye,
+    envoiEnCours,
     resetClient,
     erreur,
     submitOrder,
@@ -66,12 +67,7 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
   const { lignes, totalArticles, totalPrix, poidsGrammes } = panierTotaux(selection, miels, clientType)
 
   const poidsKg = poidsGrammes / 1000
-  const cartonsPleins = Math.floor(totalArticles / POTS_PAR_CARTON)
-  const reste = totalArticles % POTS_PAR_CARTON
-  const cartonLabel =
-    totalArticles < POTS_PAR_CARTON
-      ? 'moins d’un carton'
-      : `${cartonsPleins} carton${cartonsPleins > 1 ? 's' : ''} de 12${reste ? ` + ${reste} pot${reste > 1 ? 's' : ''}` : ''}`
+  const cartonTexte = cartonLabel(totalArticles)
 
   // Livraison impossible dès que le panier dépasse le poids max (indépendant de la case cochée).
   const livraisonImpossible = !pro && fraisLivraison(poidsGrammes) === null
@@ -196,7 +192,7 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
             <div className="mt-4 space-y-2 border-t border-cream/10 pt-4">
               <div className="flex items-center justify-between font-body text-sm text-cream/60">
                 <span>{totalArticles} pot{totalArticles > 1 ? 's' : ''} · ≈ {poidsKg.toLocaleString('fr-FR', { maximumFractionDigits: 2 })} kg</span>
-                {pro && <span className="text-cream/50">{cartonLabel}</span>}
+                {pro && <span className="text-cream/50">{cartonTexte}</span>}
               </div>
 
               {pro ? (
@@ -293,8 +289,12 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
 
         <textarea className={CHAMP + ' min-h-[96px] resize-y'} placeholder="Un mot pour Sophie (facultatif)" value={client.message} onChange={e => setClient({ ...client, message: e.target.value })} />
         {erreur && <Alerte>{erreur}</Alerte>}
-        <button type="submit" className="mt-1 rounded-full bg-honey px-7 py-3.5 font-body text-base font-bold text-white shadow-jar transition-colors hover:bg-honey-deep">
-          Envoyer mon bon de commande
+        <button
+          type="submit"
+          disabled={envoiEnCours}
+          className="mt-1 rounded-full bg-honey px-7 py-3.5 font-body text-base font-bold text-white shadow-jar transition-colors hover:bg-honey-deep disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-honey"
+        >
+          {envoiEnCours ? 'Envoi en cours…' : 'Envoyer mon bon de commande'}
         </button>
         <p className="font-body text-xs text-cream/40">
           Vos informations ne servent qu&apos;à traiter votre commande. Aucun paiement n&apos;est demandé sur ce site.
@@ -310,7 +310,7 @@ export function BonDeCommande({ miels }: { miels: Miel[] }) {
     <section id="commander" className="scroll-mt-20 bg-ink text-cream">
       <div className="mx-auto max-w-7xl px-5 py-16 md:px-10 md:py-28">
         <div className="mb-12 max-w-2xl">
-          <SectionLabel className="!text-honey/50">Bon de commande</SectionLabel>
+          <SectionLabel className="!text-honey">Bon de commande</SectionLabel>
           <h2 className="mt-4 font-display text-4xl leading-tight text-cream md:text-5xl">
             Commandez en direct
           </h2>

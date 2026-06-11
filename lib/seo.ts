@@ -17,7 +17,11 @@ const business = {
   country: 'FR',
 }
 
-/** LocalBusiness / FoodEstablishment — drives the Google local pack and the knowledge panel. */
+/**
+ * LocalBusiness — drives the Google local pack and the knowledge panel.
+ * Deliberately NOT FoodEstablishment: that type expects `servesCuisine`,
+ * which is irrelevant for a honey farm (see CLAUDE.md › SEO).
+ */
 export function buildLocalBusinessLd() {
   return {
     '@context': 'https://schema.org',

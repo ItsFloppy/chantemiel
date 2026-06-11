@@ -24,6 +24,18 @@ export function poidsToGrammes(poids: string): number {
   return s.includes('kg') ? n * 1000 : n
 }
 
+/**
+ * Libellé lisible du nombre de cartons (12 pots) pour une commande entreprise.
+ * Partagé entre le récap à l'écran et le corps de l'e-mail, pour que le client
+ * et Sophie lisent exactement la même formulation. Ex. « 2 cartons de 12 + 3 pots ».
+ */
+export function cartonLabel(totalArticles: number): string {
+  const pleins = Math.floor(totalArticles / POTS_PAR_CARTON)
+  const reste = totalArticles % POTS_PAR_CARTON
+  if (totalArticles < POTS_PAR_CARTON) return 'moins d’un carton'
+  return `${pleins} carton${pleins > 1 ? 's' : ''} de 12${reste ? ` + ${reste} pot${reste > 1 ? 's' : ''}` : ''}`
+}
+
 /** Prix unitaire affiché selon le type de client (HT pour l'entreprise, TTC pour le particulier). */
 export function prixFormat(format: Format, type: ClientType): string {
   return type === 'entreprise' ? format.prixPro ?? format.prix : format.prix
@@ -104,11 +116,10 @@ export function buildOrderBody(
 
   if (type === 'entreprise') {
     const tva = totalPrix * TVA_PRO
-    const cartons = totalArticles / POTS_PAR_CARTON
     return {
       ...base,
       siret: client.siret,
-      pots: `${totalArticles} pot${totalArticles > 1 ? 's' : ''} (${cartons.toLocaleString('fr-FR', { maximumFractionDigits: 2 })} carton de 12)`,
+      pots: `${totalArticles} pot${totalArticles > 1 ? 's' : ''} (${cartonLabel(totalArticles)})`,
       total_ht: formatEuro(totalPrix),
       tva: `${formatEuro(tva)} (5,5 %)`,
       total: formatEuro(totalPrix + tva),

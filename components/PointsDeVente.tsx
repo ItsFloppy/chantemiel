@@ -8,6 +8,7 @@ export function PointsDeVente() {
   const mapEl = useRef<HTMLDivElement>(null)
   const mapRef = useRef<any>(null)
   const markersRef = useRef<Record<string, any>>({})
+  const resizeObsRef = useRef<ResizeObserver | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
 
   useEffect(() => {
@@ -21,7 +22,16 @@ export function PointsDeVente() {
         initCarte()
       }
     }, 60)
-    return () => clearInterval(timer)
+    return () => {
+      clearInterval(timer)
+      resizeObsRef.current?.disconnect()
+      resizeObsRef.current = null
+      if (mapRef.current) {
+        mapRef.current.remove()
+        mapRef.current = null
+      }
+      markersRef.current = {}
+    }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function initCarte() {
@@ -59,6 +69,7 @@ export function PointsDeVente() {
     map.invalidateSize()
     const ro = new ResizeObserver(() => map.invalidateSize())
     ro.observe(mapEl.current!)
+    resizeObsRef.current = ro
   }
 
   useEffect(() => {

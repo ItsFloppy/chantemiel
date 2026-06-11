@@ -22,6 +22,7 @@ interface CartContextValue {
   clientType: ClientType
   livraison: boolean
   envoye: boolean
+  envoiEnCours: boolean
   erreur: string
   cartOpen: boolean
   onAdd: (miel: Miel, poids: string) => void
@@ -45,6 +46,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [clientType, setClientType] = useState<ClientType>('particulier')
   const [livraison, setLivraison] = useState(false)
   const [envoye, setEnvoye] = useState(false)
+  const [envoiEnCours, setEnvoiEnCours] = useState(false)
   const [erreur, setErreur] = useState('')
   const [cartOpen, setCartOpen] = useState(false)
 
@@ -82,6 +84,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   function submitOrder(e: React.FormEvent, miels: Miel[]) {
     e.preventDefault()
+    if (envoiEnCours) return
     setErreur('')
 
     const { lignes, poidsGrammes } = panierTotaux(selection, miels, clientType)
@@ -130,6 +133,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return
     }
 
+    setEnvoiEnCours(true)
     fetch(`https://formspree.io/f/${formId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
@@ -141,6 +145,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         else setErreur("Une erreur est survenue. Merci d'envoyer votre commande par e-mail.")
       })
       .catch(() => setErreur("Une erreur est survenue. Merci d'envoyer votre commande par e-mail."))
+      .finally(() => setEnvoiEnCours(false))
   }
 
   return (
@@ -151,6 +156,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         clientType,
         livraison,
         envoye,
+        envoiEnCours,
         erreur,
         cartOpen,
         onAdd,

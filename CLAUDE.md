@@ -100,7 +100,7 @@ app/page.tsx (server component)
 - `client: ClientInfo` — form fields (nom, email, tel, adresseNumero, adresseRue, codePostal, ville, siret, message)
 - `clientType: 'particulier' | 'entreprise'` — drives pricing (TTC vs HT) across catalogue + order form; **persists** across submit (not reset)
 - `livraison: boolean` — particulier delivery toggle; adds La Poste shipping fee to the total
-- `envoye`, `erreur`, `cartOpen` — UI state
+- `envoye`, `envoiEnCours`, `erreur`, `cartOpen` — UI state (`envoiEnCours` locks the submit button during the Formspree POST to prevent double-sends)
 - `onAdd(miel, poids)` / `onRemove(miel, poids)` — increment/decrement selection
 - `setQte(miel, poids, q)` — set an exact quantity (used by the catalogue number input); clamps to integers ≥ 0
 - `resetClient()` — clears `client` + `livraison` (called after a successful submit)
@@ -192,7 +192,7 @@ lib/
   types.ts                  Miel, Format (prix + prixPro), ClientType, PointDeVente, Contact, ClientInfo, Selection
   data.ts                   Static fallback: MIELS_STATIC (prix + prixPro), POINTS_DE_VENTE, MIELLERIE, CONTACT
   cart.tsx                  CartContext, CartProvider, useCart (clientType, livraison, setQte, resetClient)
-  order.ts                  prixToNumber, poidsToGrammes, prixFormat, fraisLivraison, formatEuro, panierTotaux, trouveItem, buildOrderBody; consts TVA_PRO, POTS_PAR_CARTON, FRAIS_PORT
+  order.ts                  prixToNumber, poidsToGrammes, prixFormat, cartonLabel, fraisLivraison, formatEuro, panierTotaux, trouveItem, buildOrderBody; consts TVA_PRO, POTS_PAR_CARTON, FRAIS_PORT
   seo.ts                    SITE_URL, JSON-LD builders, FAQ_ITEMS
   sanity.client.ts          createClient + urlFor image builder
   sanity.queries.ts         getMiels() — Sanity or static fallback
@@ -227,8 +227,6 @@ Defined in `app/globals.css`:
 | `cart-expand` / `cart-collapse` | Spring in / ease out for order panel |
 | `backdrop-in` / `backdrop-out` | Fade in/out for the overlay backdrop |
 | `qte-input` | Catalogue quantity `<input type=number>` — hides the native spin buttons |
-| `stepper-collapse` / `.open` | (legacy) Animated reveal of the − button; superseded by the number input |
-| `stepper-num` / `.open` | Animated reveal of the quantity number |
 | `merci-check`, `merci-item`, `merci-confetti`, `merci-shine` | Post-submit success animation |
 | `pin-miel`, `pin-miellerie`, `.is-active` | Leaflet map pin styles |
 
