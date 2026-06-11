@@ -18,7 +18,7 @@ function CarteMiel({ miel }: { miel: Miel }) {
         <div className="relative flex min-h-[21rem] flex-1 flex-col overflow-hidden rounded-t-2xl will-change-transform">
           <Image
             src={miel.image}
-            alt={`Pot de ${miel.nom} bio Chantemiel — terroir ${miel.terroir}`}
+            alt={`Pot de ${miel.nom} bio Chantemiel, terroir ${miel.terroir}`}
             fill
             className={
               'object-cover transition-transform duration-[1.2s] group-hover:scale-105 ' +

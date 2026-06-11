@@ -7,7 +7,7 @@ export const SITE_URL = 'https://chantemiel.fr'
 
 const business = {
   name: 'Chantemiel',
-  legalName: 'Chantemiel — Sophie Mus',
+  legalName: 'Chantemiel, Sophie Mus',
   description:
     "Miellerie certifiée Agriculture Biologique de Sophie Mus, apicultrice récoltante à L'Isle-sur-la-Sorgue (Vaucluse). Six miels récoltés en Provence et mis en pot à froid, sans antibiotique ni répulsif.",
   street: '315 Hameau Petit Palais',
@@ -67,7 +67,7 @@ export function buildProductsLd(miels: Miel[]) {
   return miels.map(miel => {
     const offers = miel.formats.map(f => ({
       '@type': 'Offer',
-      name: `${miel.nom} — ${f.poids}`,
+      name: `${miel.nom}, ${f.poids}`,
       price: prixToNumber(f.prix).toFixed(2),
       priceCurrency: 'EUR',
       availability: f.disponible
@@ -112,7 +112,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: 'Comment passer commande ?',
-    a: "Choisissez vos miels et formats sur le site, remplissez le bon de commande, et je vous recontacte par e-mail pour organiser le règlement et l’envoi ou le retrait. Il n’y a pas de paiement en ligne — tout se fait en direct, entre nous.",
+    a: "Choisissez vos miels et formats sur le site, remplissez le bon de commande, et je vous recontacte par e-mail pour organiser le règlement et l’envoi ou le retrait. Il n’y a pas de paiement en ligne : tout se fait en direct, entre nous.",
   },
 ]
 

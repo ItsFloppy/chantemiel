@@ -40,7 +40,7 @@ export function APropos() {
               <div className="mt-6 flex flex-col gap-4 font-body text-base leading-relaxed text-ink-soft">
                 <p>
                   J&apos;ai découvert et appris le métier chez un apiculteur passionné qui élaborait
-                  son miel selon le cahier des charges de l&apos;apiculture biologique — qui, à mon sens,
+                  son miel selon le cahier des charges de l&apos;apiculture biologique qui, à mon sens,
                   devrait être la seule façon de produire, dans le respect de l&apos;homme et de l&apos;environnement.
                 </p>
                 <p>

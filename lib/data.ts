@@ -118,7 +118,7 @@ export const POINTS_DE_VENTE: PointDeVente[] = [
 
 export const CONTACT: Contact = {
   nom: 'Sophie Mus',
-  metier: 'Apicultrice récoltante',
+  metier: 'apicultrice récoltante',
   adresse: '315 Hameau Petit Palais, 84800 L\'Isle-sur-la-Sorgue',
   email: 'chantemiel@wanadoo.fr',
   tel: '06 34 99 23 99',

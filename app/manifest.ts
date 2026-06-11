@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Chantemiel — Miel bio du Luberon',
+    name: 'Chantemiel, miel bio du Luberon',
     short_name: 'Chantemiel',
     description:
       'Miels certifiés BIO Ecocert, récoltés en Provence par Sophie Mus, dans le Vaucluse.',

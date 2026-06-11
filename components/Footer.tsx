@@ -19,7 +19,7 @@ export function Footer() {
           <div className="font-body text-sm">
             <h4 className="font-display text-lg text-cream">Contact</h4>
             <ul className="mt-4 flex flex-col gap-2 text-cream/70">
-              <li>{c.nom} — {c.metier}</li>
+              <li>{c.nom}, {c.metier}</li>
               <li>{c.adresse}</li>
               <li>
                 <a href={`mailto:${c.email}`} className="text-honey hover:underline">{c.email}</a>
@@ -40,7 +40,7 @@ export function Footer() {
         </div>
 
         <div className="mt-12 flex flex-col gap-2 border-t border-cream/10 pt-6 font-body text-xs text-cream/40 sm:flex-row sm:items-center sm:justify-between">
-          <span>© {new Date().getFullYear()} Chantemiel — {c.nom}, L&apos;Isle-sur-la-Sorgue.</span>
+          <span>© {new Date().getFullYear()} Chantemiel · {c.nom}, L&apos;Isle-sur-la-Sorgue.</span>
           <span>Apiculture biologique · Certifiée Ecocert</span>
         </div>
       </div>

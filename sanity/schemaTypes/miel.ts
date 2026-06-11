@@ -69,7 +69,7 @@ export const miel = defineType({
             prepare(value: Record<string, any>) {
               const { title, subtitle, disponible } = value as { title: string; subtitle: string; disponible: boolean }
               return {
-                title: `${title} — ${subtitle}`,
+                title: `${title} · ${subtitle}`,
                 subtitle: disponible ? '✓ Disponible' : '✗ Épuisé',
               }
             },
