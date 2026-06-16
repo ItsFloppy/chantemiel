@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "tsx scripts/seed-sanity.ts"
+    "seed": "tsx scripts/seed-sanity.ts",
+    "restore": "node scripts/local/sanity-restore.mjs"
   },
   "dependencies": {
     "@sanity/client": "^6.22.0",

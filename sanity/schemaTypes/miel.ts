@@ -19,6 +19,13 @@ export const miel = defineType({
       validation: Rule => Rule.required(),
     }),
     defineField({
+      name: 'enLigne',
+      title: 'Visible sur le site',
+      description: 'Décochez pour retirer ce miel du site public. Il reste enregistré ici et peut être remis en ligne à tout moment.',
+      type: 'boolean',
+      initialValue: true,
+    }),
+    defineField({
       name: 'image',
       title: 'Photo',
       type: 'image',
@@ -86,7 +93,15 @@ export const miel = defineType({
     }),
   ],
   preview: {
-    select: { title: 'nom', media: 'image' },
+    select: { title: 'nom', media: 'image', enLigne: 'enLigne' },
+    prepare(value: Record<string, any>) {
+      const { title, media, enLigne } = value as { title: string; media: any; enLigne?: boolean }
+      return {
+        title,
+        media,
+        subtitle: enLigne === false ? '🚫 Masqué du site' : undefined,
+      }
+    },
   },
   orderings: [
     { title: 'Ordre d\'affichage', name: 'ordreAsc', by: [{ field: 'ordre', direction: 'asc' }] },

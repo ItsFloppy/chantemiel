@@ -72,6 +72,7 @@ async function seed() {
       _type: 'miel',
       id: { _type: 'slug', current: miel.id },
       nom: miel.nom,
+      enLigne: true,
       image: { _type: 'image', asset: { _type: 'reference', _ref: imageAssetId } },
       saison: miel.saison,
       terroir: miel.terroir,

@@ -118,13 +118,13 @@ Cart key format: `"fleurs-luberon__500g"` (miel id + `__` + poids string).
 
 - Client: `lib/sanity.client.ts` — `sanityClient` + `urlFor()` image builder
 - Queries: `lib/sanity.queries.ts` — `getMiels()` with `{ next: { revalidate: 60 } }`
-- Schema: `sanity/schemaTypes/miel.ts` — `id` (slug), `nom`, `image` (with hotspot), `saison`, `terroir`, `description`, `notes[]`, `formats[]` (poids/prix/prixPro/disponible), `ordre`
+- Schema: `sanity/schemaTypes/miel.ts` — `id` (slug), `nom`, `enLigne` (bool, "Visible sur le site", `initialValue: true`), `image` (with hotspot), `saison`, `terroir`, `description`, `notes[]`, `formats[]` (poids/prix/prixPro/disponible), `ordre`. Document preview flags `🚫 Masqué du site` when `enLigne === false`.
 - Embedded studio at `/studio` — `app/studio/[[...tool]]/page.tsx` (server) + `StudioClient.tsx` (`'use client'`)
 - Config: `sanity.config.ts` — `structureTool` + `visionTool`
 
-GROQ projection in `getMiels()`:
+GROQ projection in `getMiels()` (filters out hidden honeys — `enLigne != false` keeps legacy docs without the field visible):
 ```groq
-*[_type == "miel"] | order(ordre asc) {
+*[_type == "miel" && enLigne != false] | order(ordre asc) {
   "id": id.current,
   nom,
   "image": image.asset->url,

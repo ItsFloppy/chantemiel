@@ -2,6 +2,7 @@ import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import { visionTool } from '@sanity/vision'
 import { schemaTypes } from './sanity/schemaTypes'
+import { StudioNavbar } from './sanity/components/StudioNavbar'
 
 export default defineConfig({
   name: 'chantemiel',
@@ -19,4 +20,9 @@ export default defineConfig({
     visionTool(),
   ],
   schema: { types: schemaTypes },
+  studio: {
+    components: {
+      navbar: StudioNavbar,
+    },
+  },
 })

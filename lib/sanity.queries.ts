@@ -28,7 +28,7 @@ export async function getMiels(): Promise<Miel[]> {
 
   try {
     const miels = await sanityClient.fetch<Miel[]>(
-      `*[_type == "miel"] | order(ordre asc) {
+      `*[_type == "miel" && enLigne != false] | order(ordre asc) {
         "id": id.current,
         nom,
         "image": image.asset->url,

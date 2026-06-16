@@ -32,7 +32,7 @@ export function buildLocalBusinessLd() {
     description: business.description,
     url: SITE_URL,
     image: `${SITE_URL}/images/pyramide-pots.jpg`,
-    logo: `${SITE_URL}/images/logo.jpg`,
+    logo: `${SITE_URL}/images/logo.png`,
     email: CONTACT.email,
     telephone: '+33634992399',
     founder: {

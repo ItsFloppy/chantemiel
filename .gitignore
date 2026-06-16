@@ -41,3 +41,7 @@ docs/facture-biosphere.md
 
 # Raw video masters — only the compressed .mp4/.webm derivatives are committed
 public/images/*.mov
+
+# Local-only Sanity backup/restore tooling & data dumps (never committed)
+scripts/local/
+sanity-backups/
