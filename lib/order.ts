@@ -13,9 +13,34 @@ export const FRAIS_PORT = [
 /** Poids maximum expédiable (kg). Au-delà : pas de livraison postale. */
 export const POIDS_MAX_LIVRAISON_KG = 5
 
-export function prixToNumber(prix: string | null | undefined): number {
+/**
+ * Renvoie la valeur numérique d'un prix. Tolère les nombres (nouveau modèle
+ * Sanity) comme les chaînes héritées ("6,50 €", "11 €", "7") — ce qui garantit
+ * qu'aucune fenêtre de migration (données string ↔ number) ne casse le rendu.
+ */
+export function prixToNumber(prix: number | string | null | undefined): number {
+  if (typeof prix === 'number') return Number.isFinite(prix) ? prix : 0
   if (!prix) return 0
   return parseFloat(prix.replace('€', '').replace(',', '.').trim()) || 0
+}
+
+/**
+ * Formate un prix unitaire en euros français, « € » inclus : `6,50 €`, `11 €`.
+ * Les centimes ne s'affichent que s'ils existent (un prix entier reste « 11 € »).
+ */
+export function formatPrix(prix: number | string | null | undefined): string {
+  const v = prixToNumber(prix)
+  const avecCentimes = Math.round(v * 100) % 100 !== 0
+  return `${v.toLocaleString('fr-FR', {
+    minimumFractionDigits: avecCentimes ? 2 : 0,
+    maximumFractionDigits: 2,
+  })} €`
+}
+
+/** Valeur numérique du prix unitaire selon le type de client (HT pro / TTC particulier). */
+export function prixValeur(format: Format, type: ClientType): number {
+  const brut = type === 'entreprise' ? format.prixPro ?? format.prix : format.prix
+  return prixToNumber(brut)
 }
 
 /** Convertit un poids ("250g", "500g", "1 kg") en grammes. */
@@ -38,9 +63,9 @@ export function cartonLabel(totalArticles: number): string {
   return `${pleins} carton${pleins > 1 ? 's' : ''} de 12${reste ? ` + ${reste} pot${reste > 1 ? 's' : ''}` : ''}`
 }
 
-/** Prix unitaire affiché selon le type de client (HT pour l'entreprise, TTC pour le particulier). */
+/** Prix unitaire affiché (« € » inclus) selon le type de client (HT pour l'entreprise, TTC pour le particulier). */
 export function prixFormat(format: Format, type: ClientType): string {
-  return type === 'entreprise' ? format.prixPro ?? format.prix : format.prix
+  return formatPrix(prixValeur(format, type))
 }
 
 /**
@@ -64,7 +89,7 @@ export function panierTotaux(selection: Selection, miels: Miel[], type: ClientTy
   const totalArticles = lignes.reduce((s, [, q]) => s + q, 0)
   const totalPrix = lignes.reduce((s, [key, q]) => {
     const item = trouveItem(key, miels)
-    return s + (item.format ? prixToNumber(prixFormat(item.format, type)) * q : 0)
+    return s + (item.format ? prixValeur(item.format, type) * q : 0)
   }, 0)
   const poidsGrammes = lignes.reduce((s, [key, q]) => {
     const item = trouveItem(key, miels)

@@ -1,5 +1,6 @@
 import { sanityClient } from './sanity.client'
 import { MIELS_STATIC } from './data'
+import { prixToNumber } from './order'
 import type { Miel } from './types'
 
 /**
@@ -19,7 +20,9 @@ const PLACEHOLDER_IMAGE = '/images/pyramide-pots.jpg'
  *
  * On garantit donc des valeurs sûres :
  * - `image` → placeholder si absente ;
- * - chaînes (`nom`, `saison`, `terroir`, `description`, `poids`, `prix`) → `''` ;
+ * - chaînes (`nom`, `saison`, `terroir`, `description`, `poids`) → `''` ;
+ * - `prix`/`prixPro` → nombres via `prixToNumber` (tolère le format hérité
+ *   "6,50 €" comme le nouveau champ numérique, sans fenêtre de migration cassée) ;
  * - `notes`/`formats` → tableaux ;
  * - `disponible` → booléen (absent = épuisé) ;
  * - `prixPro` → backfill depuis les données statiques si Sanity ne le fournit pas.
@@ -37,11 +40,12 @@ function normaliseMiels(miels: Miel[]): Miel[] {
       notes: miel.notes ?? [],
       formats: (miel.formats ?? []).map(f => {
         const refFormat = ref?.formats.find(rf => rf.poids === f.poids)
+        const prixProBrut = f.prixPro ?? refFormat?.prixPro
         return {
           ...f,
           poids: f.poids ?? '',
-          prix: f.prix ?? '',
-          prixPro: f.prixPro ?? refFormat?.prixPro,
+          prix: prixToNumber(f.prix),
+          prixPro: prixProBrut != null ? prixToNumber(prixProBrut) : undefined,
           disponible: f.disponible ?? false,
         }
       }),

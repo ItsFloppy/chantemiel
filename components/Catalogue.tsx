@@ -18,7 +18,7 @@ function CarteMiel({ miel }: { miel: Miel }) {
     <Reveal className="h-full">
       <article className="group flex h-full flex-col overflow-hidden rounded-2xl bg-paper shadow-soft transition-all duration-500 hover:-translate-y-1 hover:shadow-jar transform-gpu">
         {/* Image zone — extends down over title/desc/notes */}
-        <div className="relative flex min-h-[21rem] flex-1 flex-col overflow-hidden rounded-t-2xl will-change-transform">
+        <div className="relative flex min-h-[21rem] flex-1 flex-col overflow-hidden rounded-t-2xl">
           <Image
             src={miel.image}
             alt={`Pot de ${miel.nom} bio Chantemiel, terroir ${miel.terroir}`}
@@ -28,6 +28,27 @@ function CarteMiel({ miel }: { miel: Miel }) {
               (tousEpuises ? 'grayscale-[0.85]' : '')
             }
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
+
+          {/* Flou progressif en bas : copie floutée de la photo, masquée pour ne
+              flouter que le bas. On utilise filter: blur (et non backdrop-filter)
+              car la copie zoome en même temps que la photo nette — le flou reste
+              donc collé à l'image pendant l'animation, sans « saut » de calque. */}
+          <Image
+            src={miel.image}
+            alt=""
+            aria-hidden
+            fill
+            className={
+              'object-cover transition-transform duration-[1.2s] group-hover:scale-105 ' +
+              (tousEpuises ? 'grayscale-[0.85]' : '')
+            }
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            style={{
+              filter: 'blur(3px)',
+              maskImage: 'linear-gradient(to top, #000 30%, transparent 62%)',
+              WebkitMaskImage: 'linear-gradient(to top, #000 30%, transparent 62%)',
+            }}
           />
 
           {/* Duochromie miel (épuisé) */}
@@ -40,16 +61,6 @@ function CarteMiel({ miel }: { miel: Miel }) {
 
           {/* Scrim lisibilité */}
           <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-ink/72 to-ink/25" />
-          {/* Flou progressif en bas */}
-          <div
-            className="absolute inset-x-0 bottom-0 h-2/3"
-            style={{
-              backdropFilter: 'blur(3px)',
-              WebkitBackdropFilter: 'blur(3px)',
-              maskImage: 'linear-gradient(to top, #000 42%, transparent)',
-              WebkitMaskImage: 'linear-gradient(to top, #000 42%, transparent)',
-            }}
-          />
 
           {/* Badge terroir + épuisé */}
           <div className="relative flex items-start justify-between p-4">

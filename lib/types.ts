@@ -1,9 +1,9 @@
 export interface Format {
   poids: string
-  /** Prix particulier, TTC (ex. "6,50 €"). */
-  prix: string
-  /** Prix entreprise par pot, HT (ex. "5,56 €"). Optionnel : fallback sur `prix`. */
-  prixPro?: string
+  /** Prix particulier, TTC, en euros (ex. 6.5). Le « € » est ajouté à l'affichage. */
+  prix: number
+  /** Prix entreprise par pot, HT, en euros (ex. 5.56). Optionnel : fallback sur `prix`. */
+  prixPro?: number
   disponible: boolean
 }
 

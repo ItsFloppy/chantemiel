@@ -10,9 +10,9 @@ export const MIELS_STATIC: Miel[] = [
     notes: ['Végétal boisé', 'Caramel', 'Balsamique'],
     description: 'Récolté en tout début d\'été, très parfumé. Composé essentiellement de thym, de chêne et de lavande sauvage.',
     formats: [
-      { poids: '250g', prix: '6,50 €', prixPro: '5,56 €', disponible: true },
-      { poids: '500g', prix: '11 €', prixPro: '9,11 €', disponible: true },
-      { poids: '1 kg', prix: '19 €', prixPro: '17,01 €', disponible: true },
+      { poids: '250g', prix: 6.5, prixPro: 5.56, disponible: true },
+      { poids: '500g', prix: 11, prixPro: 9.11, disponible: true },
+      { poids: '1 kg', prix: 19, prixPro: 17.01, disponible: true },
     ],
   },
   {
@@ -24,9 +24,9 @@ export const MIELS_STATIC: Miel[] = [
     notes: ['Corsé', 'Amertume franche', 'Boisé'],
     description: 'Récolté fin juin dans les Cévennes. Brun foncé, au goût fort et à l\'amertume prononcée.',
     formats: [
-      { poids: '250g', prix: '6,50 €', prixPro: '5,56 €', disponible: true },
-      { poids: '500g', prix: '11 €', prixPro: '9,11 €', disponible: true },
-      { poids: '1 kg', prix: '19 €', prixPro: '17,01 €', disponible: false },
+      { poids: '250g', prix: 6.5, prixPro: 5.56, disponible: true },
+      { poids: '500g', prix: 11, prixPro: 9.11, disponible: true },
+      { poids: '1 kg', prix: 19, prixPro: 17.01, disponible: false },
     ],
   },
   {
@@ -38,9 +38,9 @@ export const MIELS_STATIC: Miel[] = [
     notes: ['Aromatique', 'Fruit de la passion', 'Floral'],
     description: 'Récolté en été dans le massif du Luberon. Jaune doré à l\'état liquide, goût fortement aromatique aux notes de fruit de la passion.',
     formats: [
-      { poids: '250g', prix: '7 €', prixPro: '6,09 €', disponible: true },
-      { poids: '500g', prix: '12 €', prixPro: '10,54 €', disponible: true },
-      { poids: '1 kg', prix: '21 €', prixPro: '17,94 €', disponible: false },
+      { poids: '250g', prix: 7, prixPro: 6.09, disponible: true },
+      { poids: '500g', prix: 12, prixPro: 10.54, disponible: true },
+      { poids: '1 kg', prix: 21, prixPro: 17.94, disponible: false },
     ],
   },
   {
@@ -52,9 +52,9 @@ export const MIELS_STATIC: Miel[] = [
     notes: ['Caramel', 'Pain d\'épices', 'Saveur forte'],
     description: 'Récolté au tout début du printemps dans le massif des Maures (Var). Brun clair, saveur forte, notes de caramel et de pain d\'épices.',
     formats: [
-      { poids: '250g', prix: '7 €', prixPro: '6,09 €', disponible: true },
-      { poids: '500g', prix: '12 €', prixPro: '10,54 €', disponible: true },
-      { poids: '1 kg', prix: '21 €', prixPro: '17,94 €', disponible: true },
+      { poids: '250g', prix: 7, prixPro: 6.09, disponible: true },
+      { poids: '500g', prix: 12, prixPro: 10.54, disponible: true },
+      { poids: '1 kg', prix: 21, prixPro: 17.94, disponible: true },
     ],
   },
   {
@@ -66,9 +66,9 @@ export const MIELS_STATIC: Miel[] = [
     notes: ['Floral discret', 'Toujours liquide', 'Très doux'],
     description: 'Récolté au mois de mai en Isère. Jaune très clair, il reste toujours liquide. Goût floral très discret.',
     formats: [
-      { poids: '250g', prix: '6,50 €', prixPro: '6,09 €', disponible: false },
-      { poids: '500g', prix: '11 €', prixPro: '10,54 €', disponible: false },
-      { poids: '1 kg', prix: '19 €', prixPro: '17,94 €', disponible: false },
+      { poids: '250g', prix: 6.5, prixPro: 6.09, disponible: false },
+      { poids: '500g', prix: 11, prixPro: 10.54, disponible: false },
+      { poids: '1 kg', prix: 19, prixPro: 17.94, disponible: false },
     ],
   },
   {
@@ -80,9 +80,9 @@ export const MIELS_STATIC: Miel[] = [
     notes: ['Aromatique', 'Balsamique', 'Fumée végétale'],
     description: 'Miel de printemps récolté au pied des Monts de Vaucluse. Saveur aromatique, très légèrement balsamique, arôme végétal de fumée.',
     formats: [
-      { poids: '250g', prix: '6,50 €', prixPro: '6,12 €', disponible: false },
-      { poids: '500g', prix: '11 €', prixPro: '10,56 €', disponible: false },
-      { poids: '1 kg', prix: '19 €', prixPro: '17,96 €', disponible: false },
+      { poids: '250g', prix: 6.5, prixPro: 6.12, disponible: false },
+      { poids: '500g', prix: 11, prixPro: 10.56, disponible: false },
+      { poids: '1 kg', prix: 19, prixPro: 17.96, disponible: false },
     ],
   },
 ]

@@ -63,8 +63,20 @@ export const miel = defineType({
           name: 'format',
           fields: [
             { name: 'poids', title: 'Poids', type: 'string' },
-            { name: 'prix', title: 'Prix particulier (TTC)', type: 'string' },
-            { name: 'prixPro', title: 'Prix entreprise / pot (HT)', type: 'string' },
+            defineField({
+              name: 'prix',
+              title: 'Prix particulier TTC (€)',
+              type: 'number',
+              description: 'Prix en euros, sans le symbole € (ex. 6.5 pour 6,50 €). Le « € » est ajouté automatiquement sur le site.',
+              validation: Rule => Rule.required().positive(),
+            }),
+            defineField({
+              name: 'prixPro',
+              title: 'Prix entreprise / pot HT (€)',
+              type: 'number',
+              description: 'Optionnel. Prix unitaire HT en euros, sans le symbole €.',
+              validation: Rule => Rule.positive(),
+            }),
             {
               name: 'disponible',
               title: 'Disponible',
@@ -75,9 +87,15 @@ export const miel = defineType({
           preview: {
             select: { title: 'poids', subtitle: 'prix', disponible: 'disponible' },
             prepare(value: Record<string, any>) {
-              const { title, subtitle, disponible } = value as { title: string; subtitle: string; disponible: boolean }
+              const { title, subtitle, disponible } = value as { title: string; subtitle: number | string; disponible: boolean }
+              const n = typeof subtitle === 'number'
+                ? subtitle
+                : parseFloat(String(subtitle ?? '').replace('€', '').replace(',', '.').trim())
+              const prix = Number.isFinite(n)
+                ? `${n.toLocaleString('fr-FR', { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 })} €`
+                : '—'
               return {
-                title: `${title} · ${subtitle}`,
+                title: `${title} · ${prix}`,
                 subtitle: disponible ? '✓ Disponible' : '✗ Épuisé',
               }
             },
