@@ -13,12 +13,14 @@ export const FRAIS_PORT = [
 /** Poids maximum expédiable (kg). Au-delà : pas de livraison postale. */
 export const POIDS_MAX_LIVRAISON_KG = 5
 
-export function prixToNumber(prix: string): number {
+export function prixToNumber(prix: string | null | undefined): number {
+  if (!prix) return 0
   return parseFloat(prix.replace('€', '').replace(',', '.').trim()) || 0
 }
 
 /** Convertit un poids ("250g", "500g", "1 kg") en grammes. */
-export function poidsToGrammes(poids: string): number {
+export function poidsToGrammes(poids: string | null | undefined): number {
+  if (!poids) return 0
   const s = poids.toLowerCase().replace(',', '.')
   const n = parseFloat(s) || 0
   return s.includes('kg') ? n * 1000 : n

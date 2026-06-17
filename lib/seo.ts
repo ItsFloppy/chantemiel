@@ -69,18 +69,22 @@ export function buildLocalBusinessLd() {
 /** One Product per honey, with an Offer per format — eligible for product rich results. */
 export function buildProductsLd(miels: Miel[]) {
   return miels.map(miel => {
-    const offers = miel.formats.map(f => ({
-      '@type': 'Offer',
-      name: `${miel.nom}, ${f.poids}`,
-      price: prixToNumber(f.prix).toFixed(2),
-      priceCurrency: 'EUR',
-      availability: f.disponible
-        ? 'https://schema.org/InStock'
-        : 'https://schema.org/OutOfStock',
-      itemCondition: 'https://schema.org/NewCondition',
-      url: `${SITE_URL}/#catalogue`,
-      seller: { '@id': `${SITE_URL}/#business` },
-    }))
+    // Un format sans prix réel ne génère pas d'Offer : pas de "0,00 €" dans les
+    // rich results (et `prixToNumber` ne reçoit jamais de valeur invalide).
+    const offers = miel.formats
+      .filter(f => prixToNumber(f.prix) > 0)
+      .map(f => ({
+        '@type': 'Offer',
+        name: `${miel.nom}, ${f.poids}`,
+        price: prixToNumber(f.prix).toFixed(2),
+        priceCurrency: 'EUR',
+        availability: f.disponible
+          ? 'https://schema.org/InStock'
+          : 'https://schema.org/OutOfStock',
+        itemCondition: 'https://schema.org/NewCondition',
+        url: `${SITE_URL}/#catalogue`,
+        seller: { '@id': `${SITE_URL}/#business` },
+      }))
 
     return {
       '@context': 'https://schema.org',
