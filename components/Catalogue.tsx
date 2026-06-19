@@ -212,7 +212,7 @@ export function Catalogue({ miels }: { miels: Miel[] }) {
           <div className="max-w-2xl">
             <SectionLabel>La gamme</SectionLabel>
             <h2 className="mt-4 font-display text-4xl leading-tight text-ink md:text-5xl">
-              Six miels,<br className="hidden md:block" /> au fil des saisons.
+              Nos miels,<br className="hidden md:block" /> au fil des saisons.
             </h2>
           </div>
 

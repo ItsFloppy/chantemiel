@@ -2,7 +2,7 @@
 
 ## What this project is
 
-Site vitrine one-page for **Chantemiel**, the honey farm of **Sophie Mus**, a certified-organic beekeeper in L'Isle-sur-la-Sorgue (Vaucluse, Provence). The site lets visitors browse six honey varieties, find retail points of sale on an interactive map, and submit an order request by email.
+Site vitrine one-page for **Chantemiel**, the honey farm of **Sophie Mus**, a certified-organic beekeeper in L'Isle-sur-la-Sorgue (Vaucluse, Provence). The site lets visitors browse her honey varieties, find retail points of sale on an interactive map, and submit an order request by email.
 
 No online payment. Orders are sent via Formspree and Sophie follows up by email.
 
@@ -29,8 +29,11 @@ npm run dev      # dev server at http://localhost:3000
 npm run build    # production build
 npm run start    # serve production build
 npm run lint     # ESLint
-npm run seed     # seed Sanity with the 6 miels (requires SANITY_API_TOKEN)
+npm run seed     # seed Sanity with the 6 static miels (requires SANITY_API_TOKEN)
+npm run restore  # restore prod Sanity from a local backup (DESTRUCTIVE; dry-run unless --yes)
 ```
+
+Local Sanity ops live in `scripts/local/` (gitignored, need `SANITY_API_TOKEN`) — see the `scripts/` file map below.
 
 ## Environment variables
 
@@ -40,7 +43,7 @@ Defined in `.env.local` (copy from `.env.local.example`).
 |---|---|---|
 | `NEXT_PUBLIC_SANITY_PROJECT_ID` | Sanity project ID | No |
 | `NEXT_PUBLIC_SANITY_DATASET` | Sanity dataset, default `production` | No |
-| `SANITY_API_TOKEN` | Sanity write token, seed script only | No |
+| `SANITY_API_TOKEN` | Sanity write token — seed + local backup/restore/migration tooling | No |
 | `NEXT_PUBLIC_FORMSPREE_FORM_ID` | Formspree form ID | No |
 
 **Without Sanity**: `getMiels()` returns the static data from `lib/data.ts`.  
@@ -112,13 +115,14 @@ Cart key format: `"fleurs-luberon__500g"` (miel id + `__` + poids string).
 
 - **Particulier** — `prix` (TTC). Optional postal delivery (`livraison`) adds **frais de port** to the customer's charge per `fraisLivraison()`: ≤ 3 kg → 18,00 € · 3–5 kg → 24,50 € · > 5 kg → not shippable (blocked). Weight from `poidsToGrammes()` summed over the cart.
 - **Entreprise** — `prixPro` (HT, per pot, from the Biosphère invoice — see gitignored `docs/facture-biosphere.md`). Sold à l'unité or by carton of 12 (`POTS_PAR_CARTON`). Recap shows sous-total HT + TVA 5,5 % (`TVA_PRO`) + total TTC and the carton breakdown. No frais de port (transport arranged directly). SIRET required.
-- `prixFormat(format, type)` returns the right price string; `panierTotaux(selection, miels, type)` returns `{ lignes, totalArticles, totalPrix, poidsGrammes }`.
+- **Prices are stored as numbers** (euros — e.g. `6.5`, `17.01`) in Sanity (`number` field) and in `MIELS_STATIC`. The `€` is appended at display by `formatPrix()` — "11 €" / "6,50 €" (cents shown only when non-zero). `prixToNumber()` tolerates numbers *and* legacy strings ("6,50 €"), so a string↔number transition never breaks the render.
+- `prixValeur(format, type)` → numeric unit price for the client type; `prixFormat(format, type)` → that value formatted with `€`; `panierTotaux(selection, miels, type)` returns `{ lignes, totalArticles, totalPrix, poidsGrammes }`.
 
 ### Sanity
 
 - Client: `lib/sanity.client.ts` — `sanityClient` + `urlFor()` image builder
 - Queries: `lib/sanity.queries.ts` — `getMiels()` with `{ next: { revalidate: 60 } }`
-- Schema: `sanity/schemaTypes/miel.ts` — `id` (slug), `nom`, `enLigne` (bool, "Visible sur le site", `initialValue: true`), `image` (with hotspot), `saison`, `terroir`, `description`, `notes[]`, `formats[]` (poids/prix/prixPro/disponible), `ordre`. Document preview flags `🚫 Masqué du site` when `enLigne === false`.
+- Schema: `sanity/schemaTypes/miel.ts` — `id` (slug), `nom`, `enLigne` (bool, "Visible sur le site", `initialValue: true`), `image` (with hotspot), `saison`, `terroir`, `description`, `notes[]`, `formats[]` (poids, `prix`/`prixPro` as **`number`** in euros — `€` added at render, `prix` required + positive — `disponible`), `ordre`. Document preview flags `🚫 Masqué du site` when `enLigne === false`; format preview renders the numeric price as "6,50 €".
 - Embedded studio at `/studio` — `app/studio/[[...tool]]/page.tsx` (server) + `StudioClient.tsx` (`'use client'`)
 - Config: `sanity.config.ts` — `structureTool` + `visionTool`
 
@@ -131,6 +135,8 @@ GROQ projection in `getMiels()` (filters out hidden honeys — `enLigne != false
   saison, terroir, description, notes, formats
 }
 ```
+
+`getMiels()` passes every Sanity result through **`normaliseMiels()`**, which enforces the non-nullable `Miel` contract so a single incomplete document can never crash the render (a render crash would freeze prod on the stale ISR page — the schema only requires `id` + `nom`, every other field can be empty). It guarantees: missing `image` → placeholder `/images/pyramide-pots.jpg`; `prix`/`prixPro` coerced to numbers via `prixToNumber`; `notes`/`formats` → `[]`; string fields → `''`; `disponible` → `false`; and `prixPro` back-filled from `MIELS_STATIC` (matched by slug + poids) when absent.
 
 ### Leaflet map
 
@@ -189,19 +195,24 @@ components/
   JsonLd.tsx                Server component injecting LocalBusiness + Product + FAQ JSON-LD
 
 lib/
-  types.ts                  Miel, Format (prix + prixPro), ClientType, PointDeVente, Contact, ClientInfo, Selection
-  data.ts                   Static fallback: MIELS_STATIC (prix + prixPro), POINTS_DE_VENTE, MIELLERIE, CONTACT
+  types.ts                  Miel, Format (prix + prixPro as numbers), ClientType, PointDeVente, Contact, ClientInfo, Selection
+  data.ts                   Static fallback: MIELS_STATIC (6 miels, prix + prixPro as numbers), POINTS_DE_VENTE, MIELLERIE, CONTACT
   cart.tsx                  CartContext, CartProvider, useCart (clientType, livraison, setQte, resetClient)
-  order.ts                  prixToNumber, poidsToGrammes, prixFormat, cartonLabel, fraisLivraison, formatEuro, panierTotaux, trouveItem, buildOrderBody; consts TVA_PRO, POTS_PAR_CARTON, FRAIS_PORT
+  order.ts                  prixToNumber (tolerates string|number), prixValeur, formatPrix, prixFormat, poidsToGrammes, cartonLabel, fraisLivraison, formatEuro, panierTotaux, trouveItem, buildOrderBody; consts TVA_PRO, POTS_PAR_CARTON, FRAIS_PORT
   seo.ts                    SITE_URL, JSON-LD builders, FAQ_ITEMS
   sanity.client.ts          createClient + urlFor image builder
-  sanity.queries.ts         getMiels() — Sanity or static fallback
+  sanity.queries.ts         getMiels() + normaliseMiels() — Sanity or static fallback, null/shape resilience layer
 
 sanity/
   schemaTypes/miel.ts       Sanity schema for honey documents
 
 scripts/
-  seed-sanity.ts            Uploads images + creates/replaces all 6 miel documents
+  seed-sanity.ts            Uploads images + creates/replaces all 6 miel documents (derives from MIELS_STATIC)
+  local/                    Gitignored Sanity ops tooling (need SANITY_API_TOKEN); dumps land in gitignored sanity-backups/
+    sanity-backup.mjs         Full dataset export (docs + assets) → sanity-backups/<dataset>-<stamp>.tar.gz
+    sanity-restore.mjs        Restore prod from a backup — DESTRUCTIVE (deletes all miels, re-imports); dry-run unless --yes; `npm run restore`
+    sanity-build-archive.mjs  Self-contained archive of the 6 original miels with local public/images embedded (re-uploaded on import)
+    sanity-prix-to-number.mjs Migrate formats[].prix/prixPro from string → number in prod; idempotent; dry-run unless --yes
 
 public/images/
   miel-*.jpg                Six honey product photos
@@ -238,6 +249,7 @@ Defined in `app/globals.css`:
 - **`miels` is never stored in CartContext** — always passed as a prop to `submitOrder(e, miels)` and to the cart components directly, so `page.tsx` stays a server component.
 - **Sanity `id` field is a slug type**, stored as `{ _type: 'slug', current: string }`. The GROQ query projects it as `"id": id.current` to match the `Miel` interface.
 - **`createOrReplace` in the seed script** uses deterministic `_id` values (`miel-fleurs-luberon`, etc.) so re-running doesn't create duplicates.
+- **Deploy code before migrating Sanity data shapes.** The frontend coerces defensively (`prixToNumber`, `normaliseMiels`), but a migration that changes a field's type (e.g. `prix` string → number) must land *after* the new code is live — otherwise the still-deployed old code crashes the server render and ISR freezes prod on the stale page. The `prix` string→number migration was applied this way (2026-06-17).
 
 ## Real-world data
 
@@ -245,7 +257,7 @@ Defined in `app/globals.css`:
 - **Address**: 315 Hameau Petit Palais, 84800 L'Isle-sur-la-Sorgue
 - **Email**: chantemiel@wanadoo.fr — **Tel**: 06 34 99 23 99
 - **Certification**: Agriculture Biologique, certified by **Ecocert**
-- 6 honey varieties: Fleurs du Luberon, Châtaignier, Lavande, Bruyère Blanche, Acacia, Romarin
+- 6 honey varieties in `MIELS_STATIC` / seed: Fleurs du Luberon, Châtaignier, Lavande, Bruyère Blanche, Acacia, Romarin. **Production Sanity also holds 2 more added by Sophie — Fleurs des Maures, Miel de Pin — which have no `prixPro` yet (entreprise price falls back to TTC) and use poids "1Kg" (vs "1 kg").**
 - 18 retail points of sale across Vaucluse, Bouches-du-Rhône
 - **Wholesale (entreprise) prices** — HT, from the Biosphère invoice (kept in gitignored `docs/facture-biosphere.md`). Two tiers: low (Fleurs du Luberon, Châtaignier) `5,56 / 9,11 / 17,01 €`; high (Lavande, Bruyère, Acacia) `6,09 / 10,54 / 17,94 €`; Romarin ≈ high +0,02/0,03 € (`6,12 / 10,56 / 17,96 €`). Honey TVA = **5,5 %**. Cartons of 12.
 - **Shipping (frais de port, particulier)** — customer's charge, La Poste rates: ≤ 3 kg → 18,00 € · 3–5 kg → 24,50 € · no postal delivery > 5 kg.
