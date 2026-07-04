@@ -101,7 +101,7 @@ app/page.tsx (server component)
 `CartProvider` (in `app/layout.tsx`) exposes:
 - `selection: Selection` — `Record<"mielId__poids", quantity>`
 - `client: ClientInfo` — form fields (nom, email, tel, adresseNumero, adresseRue, codePostal, ville, siret, message)
-- `clientType: 'particulier' | 'entreprise'` — drives pricing (TTC vs HT) across catalogue + order form; **persists** across submit (not reset)
+- `clientType: 'particulier' | 'entreprise'` — particulier shows TTC pricing; entreprise shows **no price** and switches the flow to a **quote request (devis)** across catalogue + order form; **persists** across submit (not reset)
 - `livraison: boolean` — particulier delivery toggle; adds La Poste shipping fee to the total
 - `envoye`, `envoiEnCours`, `erreur`, `cartOpen` — UI state (`envoiEnCours` locks the submit button during the Formspree POST to prevent double-sends)
 - `onAdd(miel, poids)` — increment selection (decrement/exact qty go through `setQte`)
@@ -114,7 +114,7 @@ Cart key format: `"fleurs-luberon__500g"` (miel id + `__` + poids string).
 ### Pricing & shipping (particulier vs entreprise)
 
 - **Particulier** — `prix` (TTC). Optional postal delivery (`livraison`) adds **frais de port** to the customer's charge per `fraisLivraison()`: ≤ 3 kg → 18,00 € · 3–5 kg → 24,50 € · > 5 kg → not shippable (blocked). Weight from `poidsToGrammes()` summed over the cart.
-- **Entreprise** — `prixPro` (HT, per pot, from the Biosphère invoice — see gitignored `docs/facture-biosphere.md`). Sold à l'unité or by carton of 12 (`POTS_PAR_CARTON`). Recap shows sous-total HT + TVA 5,5 % (`TVA_PRO`) + total TTC and the carton breakdown. No frais de port (transport arranged directly). SIRET required.
+- **Entreprise** — **demande de devis, aucun prix affiché.** The business composes a selection (same catalogue, no price shown) and submits a quote request; the CTA reads **« Demander un devis »** and Sophie replies with a personalised price by email. Recap shows only pot count + weight + carton breakdown (`cartonLabel`, carton of 12 = `POTS_PAR_CARTON`) — no HT/TVA/TTC, no total, no frais de port. SIRET required. **`prixPro` (HT, per pot, from the Biosphère invoice — gitignored `docs/facture-biosphere.md`) is kept in the schema/`MIELS_STATIC`/`normaliseMiels` as internal reference data but is no longer surfaced anywhere on the site or in the order email** (`prixValeur`/`prixFormat` still support the `entreprise` branch and `TVA_PRO` is still exported, but nothing displays them). `buildOrderBody` for entreprise sends the selection without unit prices and no totals.
 - **Prices are stored as numbers** (euros — e.g. `6.5`, `17.01`) in Sanity (`number` field) and in `MIELS_STATIC`. The `€` is appended at display by `formatPrix()` — "11 €" / "6,50 €" (cents shown only when non-zero). `prixToNumber()` tolerates numbers *and* legacy strings ("6,50 €"), so a string↔number transition never breaks the render.
 - `prixValeur(format, type)` → numeric unit price for the client type; `prixFormat(format, type)` → that value formatted with `€`; `panierTotaux(selection, miels, type)` returns `{ lignes, totalArticles, totalPrix, poidsGrammes }`.
 
@@ -185,8 +185,8 @@ components/
   Header.tsx                Scroll-aware fixed nav, solid = scrolled || open, mobile burger
   Hero.tsx                  Full-bleed autoplay video (BeeOnLavender), no poster (dark bg-ink while it loads), BioBadge, two CTAs
   Valeurs.tsx               4 trust pillars; centered, numbers in honey ring, vertical dividers
-  Catalogue.tsx             Honey card grid; Particulier/Entreprise toggle; qty = input number + −/+ buttons; mode-aware pricing; duochromie on sold-out
-  BonDeCommande.tsx         Order form + cart recap; structured address, SIRET (pro), delivery checkbox (particulier), HT/TVA/TTC vs frais de port; confetti on submit success
+  Catalogue.tsx             Honey card grid; Particulier/Entreprise toggle; qty = input number + −/+ buttons; TTC price hidden in entreprise mode (devis); duochromie on sold-out
+  BonDeCommande.tsx         Order form + cart recap; structured address, SIRET (pro), delivery checkbox (particulier); particulier = TTC/frais de port/total, entreprise = devis (no price, CTA « Demander un devis »); confetti on submit success
   CartFab.tsx               Floating cart button, spring animation, order panel overlay
   APropos.tsx               Sophie's story, portrait, italic quote, AB logo
   PointsDeVente.tsx         Leaflet map, 18 store pins, fly-to on list click
@@ -259,7 +259,7 @@ Defined in `app/globals.css`:
 - **Address**: 315 Hameau Petit Palais, 84800 L'Isle-sur-la-Sorgue
 - **Email**: chantemiel@wanadoo.fr — **Tel**: 06 34 99 23 99
 - **Certification**: Agriculture Biologique, certified by **Ecocert**
-- 6 honey varieties in `MIELS_STATIC` / seed: Fleurs du Luberon, Châtaignier, Lavande, Bruyère Blanche, Acacia, Romarin. **Production Sanity also holds 2 more added by Sophie — Fleurs des Maures, Miel de Pin — which have no `prixPro` yet (entreprise price falls back to TTC) and use poids "1Kg" (vs "1 kg").**
+- 6 honey varieties in `MIELS_STATIC` / seed: Fleurs du Luberon, Châtaignier, Lavande, Bruyère Blanche, Acacia, Romarin. **Production Sanity also holds 2 more added by Sophie — Fleurs des Maures, Miel de Pin — which have no `prixPro` yet and use poids "1Kg" (vs "1 kg"). `prixPro` is no longer displayed anyway (entreprise = devis), so a missing one is harmless.**
 - 18 retail points of sale across Vaucluse, Bouches-du-Rhône
-- **Wholesale (entreprise) prices** — HT, from the Biosphère invoice (kept in gitignored `docs/facture-biosphere.md`). Two tiers: low (Fleurs du Luberon, Châtaignier) `5,56 / 9,11 / 17,01 €`; high (Lavande, Bruyère, Acacia) `6,09 / 10,54 / 17,94 €`; Romarin ≈ high +0,02/0,03 € (`6,12 / 10,56 / 17,96 €`). Honey TVA = **5,5 %**. Cartons of 12.
+- **Wholesale (entreprise) prices** — HT, from the Biosphère invoice (kept in gitignored `docs/facture-biosphere.md`). **Internal reference only — since the entreprise flow became a quote request (devis), these are no longer shown on the site**, but kept in `prixPro` should Sophie want to reinstate them. Two tiers: low (Fleurs du Luberon, Châtaignier) `5,56 / 9,11 / 17,01 €`; high (Lavande, Bruyère, Acacia) `6,09 / 10,54 / 17,94 €`; Romarin ≈ high +0,02/0,03 € (`6,12 / 10,56 / 17,96 €`). Honey TVA = **5,5 %**. Cartons of 12.
 - **Shipping (frais de port, particulier)** — customer's charge, La Poste rates: ≤ 3 kg → 18,00 € · 3–5 kg → 24,50 € · no postal delivery > 5 kg.

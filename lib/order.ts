@@ -114,8 +114,11 @@ export function buildOrderBody(
   const panier = lignes
     .map(([key, q]) => {
       const { miel, format } = trouveItem(key, miels)
+      const base = `${miel?.nom ?? key} ${format?.poids ?? ''} × ${q}`
+      // En mode entreprise (demande de devis) aucun prix n'est affiché ni transmis.
+      if (type === 'entreprise') return base
       const pu = format ? prixFormat(format, type) : '?'
-      return `${miel?.nom ?? key} ${format?.poids ?? ''} × ${q} (${pu}/pot)`
+      return `${base} (${pu}/pot)`
     })
     .join('\n')
 
@@ -129,7 +132,7 @@ export function buildOrderBody(
   const poidsKg = poidsGrammes / 1000
 
   const base = {
-    type: type === 'entreprise' ? 'Entreprise' : 'Particulier',
+    type: type === 'entreprise' ? 'Entreprise — demande de devis' : 'Particulier',
     nom: client.nom,
     email: client.email,
     tel: client.tel,
@@ -140,14 +143,11 @@ export function buildOrderBody(
   }
 
   if (type === 'entreprise') {
-    const tva = totalPrix * TVA_PRO
+    // Demande de devis : on transmet la sélection (sans prix), Sophie chiffre elle-même.
     return {
       ...base,
       siret: client.siret,
       pots: `${totalArticles} pot${totalArticles > 1 ? 's' : ''} (${cartonLabel(totalArticles)})`,
-      total_ht: formatEuro(totalPrix),
-      tva: `${formatEuro(tva)} (5,5 %)`,
-      total: formatEuro(totalPrix + tva),
     }
   }
 

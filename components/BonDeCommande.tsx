@@ -6,7 +6,6 @@ import { useCart } from '@/lib/cart'
 import { SectionLabel } from './ui/SectionLabel'
 import { ClientTypeToggle } from './ui/ClientTypeToggle'
 import {
-  TVA_PRO,
   cartonLabel,
   formatEuro,
   fraisLivraison,
@@ -71,9 +70,9 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
 
   // Livraison impossible dès que le panier dépasse le poids max (indépendant de la case cochée).
   const livraisonImpossible = !pro && fraisLivraison(poidsGrammes) === null
-  const tva = pro ? totalPrix * TVA_PRO : 0
+  // Mode entreprise = demande de devis : aucun montant n'est calculé ni affiché.
   const port = !pro && livraison ? fraisLivraison(poidsGrammes) : 0
-  const totalFinal = pro ? totalPrix + tva : totalPrix + (port && port > 0 ? port : 0)
+  const totalFinal = totalPrix + (port && port > 0 ? port : 0)
 
   // Si le panier passe au-dessus de 5 kg alors que la livraison est cochée, on la décoche.
   useEffect(() => {
@@ -121,7 +120,7 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
           Merci, {(client.nom || '').split(' ')[0] || ''}&nbsp;!
         </h3>
         <p className="merci-item mt-3 font-body text-cream/70" style={{ animationDelay: '.14s' }}>
-          Votre bon de commande a bien été transmis. Je reviens vers vous très vite
+          {pro ? 'Votre demande de devis a bien été transmise' : 'Votre bon de commande a bien été transmis'}. Je reviens vers vous très vite
           à l&apos;adresse <span className="text-honey">{client.email || 'votre e-mail'}</span>.
         </p>
         <button
@@ -141,12 +140,18 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
       <div className="flex flex-col items-start gap-2.5">
         <span className="font-body text-sm text-cream/60">Je commande en tant que</span>
         <ClientTypeToggle tone="dark" />
+        {pro && (
+          <p className="max-w-xl font-body text-xs leading-relaxed text-cream/55">
+            En tant qu&apos;entreprise, vous ne réglez pas en ligne : composez votre sélection
+            et demandez un devis. Je reviens vers vous avec une proposition tarifaire adaptée.
+          </p>
+        )}
       </div>
 
       <div className={'grid gap-8 ' + (stack ? '' : 'lg:grid-cols-[1fr_1.1fr] lg:gap-12')}>
       {/* Récapitulatif panier */}
       <div className={stack ? 'order-1' : 'order-2 lg:order-1'}>
-        <h3 className="font-display text-xl text-cream">Votre panier</h3>
+        <h3 className="font-display text-xl text-cream">{pro ? 'Votre sélection' : 'Votre panier'}</h3>
         <div className="mt-4 rounded-2xl bg-cream/5 p-5">
           {lignes.length === 0 ? (
             <p className="py-6 text-center font-body text-sm text-cream/50">
@@ -166,7 +171,7 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-body text-sm font-semibold text-cream">{miel.nom}</p>
                       <p className="font-body text-xs text-cream/55">
-                        {format.poids} · {prixFormat(format, clientType)}{pro ? ' HT' : ''}
+                        {pro ? format.poids : `${format.poids} · ${prixFormat(format, clientType)}`}
                       </p>
                     </div>
                     <div className="flex items-center gap-1">
@@ -195,38 +200,29 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
                 {pro && <span className="text-cream/50">{cartonTexte}</span>}
               </div>
 
-              {pro ? (
-                <>
-                  <div className="flex items-center justify-between font-body text-sm text-cream/70">
-                    <span>Sous-total HT</span>
-                    <span>{formatEuro(totalPrix)}</span>
-                  </div>
-                  <div className="flex items-center justify-between font-body text-sm text-cream/70">
-                    <span>TVA 5,5 %</span>
-                    <span>{formatEuro(tva)}</span>
-                  </div>
-                </>
-              ) : livraison ? (
+              {!pro && livraison && (
                 <div className="flex items-center justify-between font-body text-sm text-cream/70">
                   <span>Frais de port</span>
                   <span>{formatEuro(port || 0)}</span>
                 </div>
-              ) : null}
+              )}
 
-              <div className="flex items-center justify-between border-t border-cream/10 pt-3">
-                <span className="font-body text-sm font-semibold text-cream">
-                  {pro ? 'Total TTC' : livraison ? 'Total à régler' : 'Total'}
-                </span>
-                <span className="font-body text-2xl font-semibold text-honey">
-                  {formatEuro(totalFinal)}
-                </span>
-              </div>
+              {!pro && (
+                <div className="flex items-center justify-between border-t border-cream/10 pt-3">
+                  <span className="font-body text-sm font-semibold text-cream">
+                    {livraison ? 'Total à régler' : 'Total'}
+                  </span>
+                  <span className="font-body text-2xl font-semibold text-honey">
+                    {formatEuro(totalFinal)}
+                  </span>
+                </div>
+              )}
             </div>
           )}
         </div>
         <p className="mt-3 font-body text-xs leading-relaxed text-cream/40">
           {pro
-            ? 'Prix HT, TVA 5,5 % incluse ci-dessus. Le transport est organisé directement avec Sophie. Le règlement se fait après confirmation.'
+            ? 'Aucun montant n’est calculé ici : je vous réponds avec une proposition tarifaire personnalisée (commande par carton de 12), puis nous convenons du transport.'
             : 'Montant indicatif. Le règlement se fait après confirmation de la commande.'}
         </p>
       </div>
@@ -284,7 +280,7 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
           </label>
         )}
         {livraisonImpossible && (
-          <Alerte>Votre panier dépasse 5 kg : la livraison postale n’est pas disponible. Contactez Sophie pour organiser le transport.</Alerte>
+          <Alerte>Votre panier dépasse 5 kg : la livraison postale n’est pas disponible. Contactez-moi pour organiser le transport.</Alerte>
         )}
 
         <textarea className={CHAMP + ' min-h-[96px] resize-y'} placeholder="Un mot pour Sophie (facultatif)" value={client.message} onChange={e => setClient({ ...client, message: e.target.value })} />
@@ -294,7 +290,7 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
           disabled={envoiEnCours}
           className="mt-1 rounded-full bg-honey px-7 py-3.5 font-body text-base font-bold text-white shadow-jar transition-colors hover:bg-honey-deep disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-honey"
         >
-          {envoiEnCours ? 'Envoi en cours…' : 'Envoyer mon bon de commande'}
+          {envoiEnCours ? 'Envoi en cours…' : pro ? 'Demander un devis' : 'Envoyer mon bon de commande'}
         </button>
         <p className="font-body text-xs text-cream/40">
           Vos informations ne servent qu&apos;à traiter votre commande. Aucun paiement n&apos;est demandé sur ce site.

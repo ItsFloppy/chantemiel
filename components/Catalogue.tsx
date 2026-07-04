@@ -128,10 +128,12 @@ function CarteMiel({ miel }: { miel: Miel }) {
                   <span className={'whitespace-nowrap font-body text-base font-semibold ' + (f.disponible ? 'text-ink' : 'text-ink/35')}>
                     {f.poids}
                   </span>
-                  <span className={'whitespace-nowrap font-body text-sm font-semibold ' + (f.disponible ? 'text-honey-deep' : 'text-ink/30 line-through')}>
-                    {prixAff}
-                    {pro && <span className="ml-1 text-[11px] font-medium text-ink/45">HT</span>}
-                  </span>
+                  {/* Aucun prix affiché en mode entreprise : la commande passe par un devis. */}
+                  {!pro && (
+                    <span className={'whitespace-nowrap font-body text-sm font-semibold ' + (f.disponible ? 'text-honey-deep' : 'text-ink/30 line-through')}>
+                      {prixAff}
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex items-center">
@@ -180,7 +182,7 @@ function CarteMiel({ miel }: { miel: Miel }) {
           })}
           {pro && (
             <p className="mt-1 px-3 font-body text-[11px] leading-snug text-ink-soft/70">
-              Tarif pro HT · à l&apos;unité ou par carton de 12 pots
+              Tarifs professionnels sur devis · à l&apos;unité ou par carton de 12 pots
             </p>
           )}
         </div>
@@ -197,7 +199,7 @@ function ClientTypeBanner() {
       <ClientTypeToggle tone="light" />
       <p className="font-body text-xs text-ink-soft/75">
         {clientType === 'entreprise'
-          ? 'Prix HT · à l’unité ou par carton de 12 · sans frais de port'
+          ? 'Tarifs sur devis : composez votre sélection, je vous recontacte avec une proposition adaptée · par carton de 12'
           : 'Prix TTC · livraison en option (frais de port La Poste à votre charge)'}
       </p>
     </div>
