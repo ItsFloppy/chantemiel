@@ -10,8 +10,6 @@ export const FRAIS_PORT = [
   { maxKg: 3, prix: 18 },
   { maxKg: 5, prix: 24.5 },
 ]
-/** Poids maximum expédiable (kg). Au-delà : pas de livraison postale. */
-export const POIDS_MAX_LIVRAISON_KG = 5
 
 /**
  * Renvoie la valeur numérique d'un prix. Tolère les nombres (nouveau modèle

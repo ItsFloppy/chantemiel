@@ -50,7 +50,7 @@ export function APropos() {
                   <strong className="font-semibold text-ink">juillet 2004</strong>.
                 </p>
                 <p>
-                  Mes ruches sont situées hors des grands axes routiers. Je n&apos;utilise aucun produit
+                  Mes ruches sont installées en pleine nature. Je n&apos;utilise aucun produit
                   répulsif ni antibiotique, j&apos;extrais le miel et le conditionne à température ambiante :
                   je garantis que toutes les propriétés de mes miels sont conservées.
                 </p>

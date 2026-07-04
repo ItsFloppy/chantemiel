@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Playfair_Display, EB_Garamond, Great_Vibes } from 'next/font/google'
 import { CartProvider } from '@/lib/cart'
+import { Loader } from '@/components/Loader'
 import { SITE_URL } from '@/lib/seo'
 import './globals.css'
 
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
     template: '%s · Chantemiel',
   },
   description:
-    "Sophie Mus, apicultrice récoltante certifiée BIO Ecocert dans le Vaucluse. Six miels (lavande, romarin, châtaignier, acacia) récoltés en Provence et mis en pot à froid. Vente directe et points de vente en Vaucluse et Bouches-du-Rhône.",
+    "Sophie Mus, apicultrice récoltante certifiée BIO Ecocert dans le Vaucluse. Des miels (lavande, romarin, châtaignier, acacia) récoltés à la main en Provence. Vente directe et points de vente en Vaucluse et Bouches-du-Rhône.",
   keywords: [
     'miel bio',
     'miel bio Vaucluse',
@@ -68,7 +69,7 @@ export const metadata: Metadata = {
     siteName: 'Chantemiel',
     title: 'Chantemiel, miel bio du Luberon récolté à L’Isle-sur-la-Sorgue',
     description:
-      "Six miels d'exception récoltés à la main en Provence par Sophie Mus, certifiés Agriculture Biologique (Ecocert).",
+      "Des miels d'exception récoltés à la main en Provence par Sophie Mus, certifiés Agriculture Biologique (Ecocert).",
     images: [
       {
         url: '/images/pyramide-pots.jpg',
@@ -82,7 +83,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Chantemiel, miel bio du Luberon',
     description:
-      'Six miels certifiés BIO Ecocert, récoltés en Provence par Sophie Mus, dans le Vaucluse.',
+      'Des miels certifiés BIO Ecocert, récoltés en Provence par Sophie Mus, dans le Vaucluse.',
     images: ['/images/pyramide-pots.jpg'],
   },
 }
@@ -94,6 +95,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${playfairDisplay.variable} ${ebGaramond.variable} ${greatVibes.variable}`}
     >
       <body className="font-body text-ink antialiased">
+        <Loader />
         <CartProvider>{children}</CartProvider>
       </body>
     </html>

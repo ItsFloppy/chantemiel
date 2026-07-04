@@ -9,7 +9,7 @@ const business = {
   name: 'Chantemiel',
   legalName: 'Chantemiel, Sophie Mus',
   description:
-    "Miellerie certifiée Agriculture Biologique de Sophie Mus, apicultrice récoltante à L'Isle-sur-la-Sorgue (Vaucluse). Six miels récoltés en Provence et mis en pot à froid, sans antibiotique ni répulsif.",
+    "Miellerie certifiée Agriculture Biologique de Sophie Mus, apicultrice récoltante à L'Isle-sur-la-Sorgue (Vaucluse). Des miels récoltés en Provence, sans antibiotique ni répulsif.",
   street: '315 Hameau Petit Palais',
   postalCode: '84800',
   city: "L'Isle-sur-la-Sorgue",
@@ -112,11 +112,11 @@ export const FAQ_ITEMS = [
   },
   {
     q: 'Les miels Chantemiel sont-ils vraiment certifiés bio ?',
-    a: "Oui. Toute ma production est certifiée Agriculture Biologique et contrôlée par Ecocert. Je mène mes ruches sans antibiotique ni répulsif chimique, et j’extrais puis mets le miel en pot à froid, pour en garder toutes les propriétés.",
+    a: "Oui. Toute ma production est certifiée Agriculture Biologique et contrôlée par Ecocert. Je mène mes ruches sans antibiotique ni répulsif chimique, et j’extrais puis conditionne le miel à température ambiante, pour en garder toutes les propriétés.",
   },
   {
     q: 'Où sont récoltés les miels ?',
-    a: "Je conduis mes 200 ruches en Provence, du Luberon aux Cévennes : lavande et romarin des Monts de Vaucluse, châtaignier des Cévennes, bruyère blanche du massif des Maures, acacia de l’Isère.",
+    a: "Je conduis mes 200 ruches en Provence et jusqu’en Isère : lavande et romarin des Monts de Vaucluse, châtaignier et acacia de l’Isère, bruyère blanche du massif des Maures.",
   },
   {
     q: 'Comment passer commande ?',

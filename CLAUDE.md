@@ -104,7 +104,7 @@ app/page.tsx (server component)
 - `clientType: 'particulier' | 'entreprise'` — drives pricing (TTC vs HT) across catalogue + order form; **persists** across submit (not reset)
 - `livraison: boolean` — particulier delivery toggle; adds La Poste shipping fee to the total
 - `envoye`, `envoiEnCours`, `erreur`, `cartOpen` — UI state (`envoiEnCours` locks the submit button during the Formspree POST to prevent double-sends)
-- `onAdd(miel, poids)` / `onRemove(miel, poids)` — increment/decrement selection
+- `onAdd(miel, poids)` — increment selection (decrement/exact qty go through `setQte`)
 - `setQte(miel, poids, q)` — set an exact quantity (used by the catalogue number input); clamps to integers ≥ 0
 - `resetClient()` — clears `client` + `livraison` (called after a successful submit)
 - `submitOrder(e, miels)` — Formspree POST; takes `miels` as argument (not stored in context). Reads `clientType` + `livraison` from context; blocks particulier delivery > 5 kg and requires SIRET in entreprise mode
@@ -120,7 +120,7 @@ Cart key format: `"fleurs-luberon__500g"` (miel id + `__` + poids string).
 
 ### Sanity
 
-- Client: `lib/sanity.client.ts` — `sanityClient` + `urlFor()` image builder
+- Client: `lib/sanity.client.ts` — `sanityClient` (the GROQ query projects `image.asset->url` directly, so no image-url builder is needed)
 - Queries: `lib/sanity.queries.ts` — `getMiels()` with `{ next: { revalidate: 60 } }`
 - Schema: `sanity/schemaTypes/miel.ts` — `id` (slug), `nom`, `enLigne` (bool, "Visible sur le site", `initialValue: true`), `image` (with hotspot), `saison`, `terroir`, `description`, `notes[]`, `formats[]` (poids, `prix`/`prixPro` as **`number`** in euros — `€` added at render, `prix` required + positive — `disponible`), `ordre`. Document preview flags `🚫 Masqué du site` when `enLigne === false`; format preview renders the numeric price as "6,50 €".
 - Embedded studio at `/studio` — `app/studio/[[...tool]]/page.tsx` (server) + `StudioClient.tsx` (`'use client'`)
@@ -151,7 +151,7 @@ Map pins use `L.divIcon` with CSS class `.pin-miel` (honey teardrop) or `.pin-mi
 All SEO is centralised around `SITE_URL` in `lib/seo.ts`.
 
 - **Metadata** — `app/layout.tsx` exports a full `Metadata`: `metadataBase`, title template, keywords (geo-targeted), canonical, `robots`, OpenGraph (`fr_FR`, 1200×630 image) and Twitter card. Page `<title>`/`<meta>` carry the keywords; on-page headings stay editorial.
-- **Generated routes** (Next.js file conventions): `app/robots.ts` (allows all, disallows `/studio`, declares sitemap), `app/sitemap.ts` (homepage + section anchors), `app/manifest.ts` (PWA), `app/icon.jpg` + `app/apple-icon.jpg` (favicons, copies of `logo.jpg`).
+- **Generated routes** (Next.js file conventions): `app/robots.ts` (allows all, disallows `/studio`, declares sitemap), `app/sitemap.ts` (homepage + section anchors), `app/manifest.ts` (PWA), `app/icon.png` + `app/apple-icon.png` (favicons, file-based convention).
 - **Structured data (JSON-LD)** — `lib/seo.ts` builds it, `components/JsonLd.tsx` (server component) injects it in `page.tsx`:
   - `buildLocalBusinessLd()` — `LocalBusiness` (address, geo, tel, Ecocert credential) → Google local pack. Not `FoodEstablishment` (that type expects `servesCuisine`, irrelevant for a honey farm).
   - `buildProductsLd(miels)` — one `Product` per honey, one `Offer` per format (price EUR, in/out of stock).
@@ -170,7 +170,7 @@ app/
   robots.ts                 robots.txt (allow all, disallow /studio, sitemap ref)
   sitemap.ts                sitemap.xml (homepage + section anchors)
   manifest.ts               PWA web manifest
-  icon.jpg / apple-icon.jpg Favicons (copies of logo.jpg, file-based convention)
+  icon.png / apple-icon.png Favicons (file-based convention)
   studio/[[...tool]]/
     page.tsx                Server shell, metadata + robots noindex
     StudioClient.tsx        'use client' NextStudio wrapper
@@ -183,7 +183,7 @@ components/
     StatutPastille.tsx      Sage dot "Dispo" / grey dot "Épuisé"
     ClientTypeToggle.tsx    Particulier / Entreprise segmented control; drives clientType in cart (tone light|dark)
   Header.tsx                Scroll-aware fixed nav, solid = scrolled || open, mobile burger
-  Hero.tsx                  Full-bleed autoplay video (BeeOnLavender), poster fallback, BioBadge, two CTAs
+  Hero.tsx                  Full-bleed autoplay video (BeeOnLavender), no poster (dark bg-ink while it loads), BioBadge, two CTAs
   Valeurs.tsx               4 trust pillars; centered, numbers in honey ring, vertical dividers
   Catalogue.tsx             Honey card grid; Particulier/Entreprise toggle; qty = input number + −/+ buttons; mode-aware pricing; duochromie on sold-out
   BonDeCommande.tsx         Order form + cart recap; structured address, SIRET (pro), delivery checkbox (particulier), HT/TVA/TTC vs frais de port; confetti on submit success
@@ -193,6 +193,7 @@ components/
   Faq.tsx                   FAQ section, copy sourced from FAQ_ITEMS in lib/seo.ts
   Footer.tsx                Contact, nav links, BioBadge, copyright
   JsonLd.tsx                Server component injecting LocalBusiness + Product + FAQ JSON-LD
+  Loader.tsx                'use client' startup splash (cream + Great Vibes logotype + shimmer bar); fades out on DOM ready, mounted in layout.tsx
 
 lib/
   types.ts                  Miel, Format (prix + prixPro as numbers), ClientType, PointDeVente, Contact, ClientInfo, Selection
@@ -200,7 +201,7 @@ lib/
   cart.tsx                  CartContext, CartProvider, useCart (clientType, livraison, setQte, resetClient)
   order.ts                  prixToNumber (tolerates string|number), prixValeur, formatPrix, prixFormat, poidsToGrammes, cartonLabel, fraisLivraison, formatEuro, panierTotaux, trouveItem, buildOrderBody; consts TVA_PRO, POTS_PAR_CARTON, FRAIS_PORT
   seo.ts                    SITE_URL, JSON-LD builders, FAQ_ITEMS
-  sanity.client.ts          createClient + urlFor image builder
+  sanity.client.ts          sanityClient (createClient)
   sanity.queries.ts         getMiels() + normaliseMiels() — Sanity or static fallback, null/shape resilience layer
 
 sanity/
@@ -217,12 +218,12 @@ scripts/
 public/images/
   miel-*.jpg                Six honey product photos
   BeeOnLavender.mp4         Hero background video (720×1280, ~7 MB, H.264; compressed from a .mov master that is gitignored)
-  pyramide-pots.jpg         Hero poster / video fallback
+  pyramide-pots.jpg         OpenGraph/Twitter share image + miel image placeholder fallback (normaliseMiels)
   sophie-ruches.jpg         APropos portrait
   ruches-verte.jpg          APropos thumbnail vignette
-  ruches-bleue.jpg          Unused (available)
   logo-ab.png               AB/BIO certification logo
-  logo.jpg                  Site logo
+  logo.png                  Site logo (referenced as JSON-LD logo)
+  icon-512.png              PWA manifest icon (app/manifest.ts)
 ```
 
 ## Key CSS classes (not Tailwind)
@@ -238,6 +239,7 @@ Defined in `app/globals.css`:
 | `cart-expand` / `cart-collapse` | Spring in / ease out for order panel |
 | `backdrop-in` / `backdrop-out` | Fade in/out for the overlay backdrop |
 | `qte-input` | Catalogue quantity `<input type=number>` — hides the native spin buttons |
+| `loader-bar` | Indeterminate honey shimmer bar in the startup `Loader` splash |
 | `merci-check`, `merci-item`, `merci-confetti`, `merci-shine` | Post-submit success animation |
 | `pin-miel`, `pin-miellerie`, `.is-active` | Leaflet map pin styles |
 

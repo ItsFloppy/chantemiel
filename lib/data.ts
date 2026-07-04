@@ -20,9 +20,9 @@ export const MIELS_STATIC: Miel[] = [
     nom: 'Miel de Châtaignier',
     image: '/images/miel-chataignier.jpg',
     saison: 'Fin juin',
-    terroir: 'Cévennes',
+    terroir: 'Isère',
     notes: ['Corsé', 'Amertume franche', 'Boisé'],
-    description: 'Récolté fin juin dans les Cévennes. Brun foncé, au goût fort et à l\'amertume prononcée.',
+    description: 'Récolté fin juin en Isère. Brun foncé, au goût fort et à l\'amertume prononcée.',
     formats: [
       { poids: '250g', prix: 6.5, prixPro: 5.56, disponible: true },
       { poids: '500g', prix: 11, prixPro: 9.11, disponible: true },

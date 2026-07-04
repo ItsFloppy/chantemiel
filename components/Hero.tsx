@@ -3,13 +3,12 @@ import { BioBadge } from './ui/BioBadge'
 
 export function Hero() {
   return (
-    <section id="top" className="relative min-h-[100svh] w-full overflow-hidden">
+    <section id="top" className="relative min-h-[100svh] w-full overflow-hidden bg-ink">
       <video
         autoPlay
         loop
         muted
         playsInline
-        poster="/images/pyramide-pots.jpg"
         aria-label="Abeille butinant un brin de lavande"
         className="absolute inset-0 h-full w-full object-cover object-center"
       >
@@ -34,8 +33,8 @@ export function Hero() {
           <Reveal delay={240}>
             <p className="mt-6 max-w-xl font-body text-base leading-relaxed text-cream/85 sm:text-lg">
               Sophie Mus, apicultrice récoltante dans le Vaucluse. Deux cents ruches
-              menées hors des grands axes, sans antibiotique ni répulsif, extraites
-              et mises en pot à froid. Six miels du Luberon aux Cévennes.
+              menées en pleine nature, sans antibiotique ni répulsif. Des miels récoltés
+              et conditionnés à température ambiante, du Luberon à l&apos;Isère.
             </p>
           </Reveal>
 
@@ -61,7 +60,7 @@ export function Hero() {
 
       <div className="absolute bottom-0 left-0 right-0 z-10 hidden items-center justify-between border-t border-cream/15 px-10 py-4 text-cream/70 md:flex">
         <span className="font-body text-xs uppercase tracking-[0.25em]">L&apos;Isle-sur-la-Sorgue · Vaucluse</span>
-        <span className="font-body text-xs uppercase tracking-[0.25em]">Installée en 2004 · 200 ruches</span>
+        <span className="font-body text-xs uppercase tracking-[0.25em]">Depuis 2004 · 200 ruches</span>
       </div>
     </section>
   )

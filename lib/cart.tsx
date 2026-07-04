@@ -26,7 +26,6 @@ interface CartContextValue {
   erreur: string
   cartOpen: boolean
   onAdd: (miel: Miel, poids: string) => void
-  onRemove: (miel: Miel, poids: string) => void
   setQte: (miel: Miel, poids: string, q: number) => void
   setSelection: React.Dispatch<React.SetStateAction<Selection>>
   setClient: React.Dispatch<React.SetStateAction<ClientInfo>>
@@ -53,17 +52,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
   function onAdd(miel: Miel, poids: string) {
     const key = `${miel.id}__${poids}`
     setSelection(prev => ({ ...prev, [key]: (prev[key] || 0) + 1 }))
-  }
-
-  function onRemove(miel: Miel, poids: string) {
-    const key = `${miel.id}__${poids}`
-    setSelection(prev => {
-      const next = { ...prev }
-      const q = (next[key] || 0) - 1
-      if (q <= 0) delete next[key]
-      else next[key] = q
-      return next
-    })
   }
 
   function setQte(miel: Miel, poids: string, q: number) {
@@ -160,7 +148,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
         erreur,
         cartOpen,
         onAdd,
-        onRemove,
         setQte,
         setSelection,
         setClient,
