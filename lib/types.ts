@@ -37,6 +37,8 @@ export interface Contact {
   email: string
   tel: string
   cheptel: string
+  /** URL du profil Instagram (optionnel). */
+  instagram?: string
 }
 
 export interface ClientInfo {

@@ -15,7 +15,10 @@ export default defineConfig({
       structure: S =>
         S.list()
           .title('Contenu')
-          .items([S.documentTypeListItem('miel').title('Miels')]),
+          .items([
+            S.documentTypeListItem('miel').title('Miels'),
+            S.documentTypeListItem('pointDeVente').title('Points de vente'),
+          ]),
     }),
     visionTool(),
   ],

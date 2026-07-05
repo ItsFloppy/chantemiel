@@ -1,7 +1,7 @@
 import { sanityClient } from './sanity.client'
-import { MIELS_STATIC } from './data'
+import { MIELS_STATIC, POINTS_DE_VENTE } from './data'
 import { prixToNumber } from './order'
-import type { Miel } from './types'
+import type { Miel, PointDeVente } from './types'
 
 /**
  * Image de repli quand un miel n'a pas (encore) de photo dans Sanity.
@@ -76,5 +76,46 @@ export async function getMiels(): Promise<Miel[]> {
     return miels?.length ? normaliseMiels(miels) : MIELS_STATIC
   } catch {
     return MIELS_STATIC
+  }
+}
+
+/**
+ * Normalise chaque point de vente issu de Sanity : le schéma requiert `nom`,
+ * `ville`, `lat`, `lng`, mais on se protège contre un document incomplet (un
+ * `null` sur `lat`/`lng` casserait `L.marker([lat, lng])` et donc le rendu de la
+ * carte). `id` vient de `_id` (identifiant stable pour la clé React et le fly-to).
+ */
+function normalisePointsDeVente(points: PointDeVente[]): PointDeVente[] {
+  return points.map(p => ({
+    id: p.id,
+    nom: p.nom ?? '',
+    ville: p.ville ?? '',
+    lat: typeof p.lat === 'number' ? p.lat : 0,
+    lng: typeof p.lng === 'number' ? p.lng : 0,
+    url: p.url || undefined,
+  }))
+}
+
+export async function getPointsDeVente(): Promise<PointDeVente[]> {
+  if (!process.env.NEXT_PUBLIC_SANITY_PROJECT_ID) {
+    return POINTS_DE_VENTE
+  }
+
+  try {
+    const points = await sanityClient.fetch<PointDeVente[]>(
+      `*[_type == "pointDeVente" && enLigne != false] | order(ordre asc) {
+        "id": _id,
+        nom,
+        ville,
+        lat,
+        lng,
+        url
+      }`,
+      {},
+      { next: { revalidate: 60 } }
+    )
+    return points?.length ? normalisePointsDeVente(points) : POINTS_DE_VENTE
+  } catch {
+    return POINTS_DE_VENTE
   }
 }

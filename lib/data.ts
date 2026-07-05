@@ -123,4 +123,13 @@ export const CONTACT: Contact = {
   email: 'chantemiel@wanadoo.fr',
   tel: '06 34 99 23 99',
   cheptel: '200 ruches',
+  instagram: 'https://www.instagram.com/chantemiel_apiculture/',
 }
+
+/**
+ * Lien de dépôt d'avis Google (Google Business Profile).
+ * Laissé vide pour l'instant : le bouton « Laisser un avis Google » ne s'affiche
+ * QUE si cette URL est renseignée. À compléter avec le lien du type
+ * `https://search.google.com/local/writereview?placeid=…` ou `https://g.page/r/…`.
+ */
+export const GOOGLE_AVIS_URL: string = ''

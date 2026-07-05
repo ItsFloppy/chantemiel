@@ -63,6 +63,7 @@ export function buildLocalBusinessLd() {
       recognizedBy: { '@type': 'Organization', name: 'Ecocert' },
     },
     knowsAbout: ['Miel bio', 'Apiculture biologique', 'Miel de lavande', 'Miel du Luberon'],
+    ...(CONTACT.instagram ? { sameAs: [CONTACT.instagram] } : {}),
   }
 }
 

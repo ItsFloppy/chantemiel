@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic'
-import { getMiels } from '@/lib/sanity.queries'
+import { getMiels, getPointsDeVente } from '@/lib/sanity.queries'
 import { Header } from '@/components/Header'
 import { Hero } from '@/components/Hero'
 import { Valeurs } from '@/components/Valeurs'
@@ -19,7 +19,7 @@ const PointsDeVente = dynamic(
 )
 
 export default async function Home() {
-  const miels = await getMiels()
+  const [miels, points] = await Promise.all([getMiels(), getPointsDeVente()])
 
   return (
     <>
@@ -31,7 +31,7 @@ export default async function Home() {
         <Catalogue miels={miels} />
         <BonDeCommande miels={miels} />
         <APropos />
-        <PointsDeVente />
+        <PointsDeVente points={points} />
         <Faq />
       </main>
       <Footer />

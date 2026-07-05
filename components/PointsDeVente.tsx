@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { SectionLabel } from './ui/SectionLabel'
-import { POINTS_DE_VENTE, MIELLERIE } from '@/lib/data'
+import { MIELLERIE } from '@/lib/data'
+import type { PointDeVente } from '@/lib/types'
 
-export function PointsDeVente() {
+export function PointsDeVente({ points }: { points: PointDeVente[] }) {
   const mapEl = useRef<HTMLDivElement>(null)
   const mapRef = useRef<any>(null)
   const markersRef = useRef<Record<string, any>>({})
@@ -54,7 +55,7 @@ export function PointsDeVente() {
       .addTo(map)
       .bindPopup(`<strong>${MIELLERIE.nom}</strong><br><span style="color:#5C4A35">${MIELLERIE.ville}</span>`)
 
-    POINTS_DE_VENTE.forEach(p => {
+    points.forEach(p => {
       const m = L.marker([p.lat, p.lng], { icon: mkIcon('') })
         .addTo(map)
         .bindPopup(
@@ -82,7 +83,7 @@ export function PointsDeVente() {
     })
   }, [selected])
 
-  function focusPoint(p: typeof POINTS_DE_VENTE[0]) {
+  function focusPoint(p: PointDeVente) {
     setSelected(p.id)
     const map = mapRef.current
     const m = markersRef.current[p.id]
@@ -125,10 +126,10 @@ export function PointsDeVente() {
             {/* Liste */}
             <div className="order-2 flex flex-col border-t border-ink/[0.08] lg:border-l lg:border-t-0">
               <div className="flex items-center justify-between px-5 pb-3 pt-5 md:px-6">
-                <span className="font-body text-lg font-semibold text-ink">{POINTS_DE_VENTE.length} points de vente</span>
+                <span className="font-body text-lg font-semibold text-ink">{points.length} points de vente</span>
               </div>
               <ul className="scroll-soft max-h-[340px] flex-1 overflow-y-auto px-3 pb-4 sm:max-h-[420px] md:px-4 lg:max-h-[535px]">
-                {POINTS_DE_VENTE.map(p => {
+                {points.map(p => {
                   const actif = selected === p.id
                   return (
                     <li key={p.id}>

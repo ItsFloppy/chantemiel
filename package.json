@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "tsx scripts/seed-sanity.ts",
+    "seed:points": "tsx scripts/seed-points.ts",
     "restore": "node scripts/local/sanity-restore.mjs"
   },
   "dependencies": {

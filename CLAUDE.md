@@ -30,6 +30,7 @@ npm run build    # production build
 npm run start    # serve production build
 npm run lint     # ESLint
 npm run seed     # seed Sanity with the 6 static miels (requires SANITY_API_TOKEN)
+npm run seed:points # seed Sanity with the static points de vente (requires SANITY_API_TOKEN)
 npm run restore  # restore prod Sanity from a local backup (DESTRUCTIVE; dry-run unless --yes)
 ```
 
@@ -121,10 +122,12 @@ Cart key format: `"fleurs-luberon__500g"` (miel id + `__` + poids string).
 ### Sanity
 
 - Client: `lib/sanity.client.ts` — `sanityClient` (the GROQ query projects `image.asset->url` directly, so no image-url builder is needed)
-- Queries: `lib/sanity.queries.ts` — `getMiels()` with `{ next: { revalidate: 60 } }`
+- Queries: `lib/sanity.queries.ts` — `getMiels()` + `getPointsDeVente()`, both with `{ next: { revalidate: 60 } }` and static fallback
 - Schema: `sanity/schemaTypes/miel.ts` — `id` (slug), `nom`, `enLigne` (bool, "Visible sur le site", `initialValue: true`), `image` (with hotspot), `saison`, `terroir`, `description`, `notes[]`, `formats[]` (poids, `prix`/`prixPro` as **`number`** in euros — `€` added at render, `prix` required + positive — `disponible`), `ordre`. Document preview flags `🚫 Masqué du site` when `enLigne === false`; format preview renders the numeric price as "6,50 €".
+- Schema: `sanity/schemaTypes/pointDeVente.ts` — `nom`, `ville`, `enLigne` (bool, "Visible sur la carte", `initialValue: true`), `lat`, `lng` (numbers, required, range-validated, descriptions explain how to get coords from Google Maps), `url?`, `ordre`. Feeds the interactive map via `getPointsDeVente()`.
+- Both schemas are registered in `sanity/schemaTypes/index.ts` and listed in the **custom** studio structure in `sanity.config.ts` (a new doc type must be added there or it won't appear in the desk).
 - Embedded studio at `/studio` — `app/studio/[[...tool]]/page.tsx` (server) + `StudioClient.tsx` (`'use client'`)
-- Config: `sanity.config.ts` — `structureTool` + `visionTool`
+- Config: `sanity.config.ts` — `structureTool` (custom structure: Miels + Points de vente) + `visionTool`
 
 GROQ projection in `getMiels()` (filters out hidden honeys — `enLigne != false` keeps legacy docs without the field visible):
 ```groq
@@ -141,6 +144,8 @@ GROQ projection in `getMiels()` (filters out hidden honeys — `enLigne != false
 ### Leaflet map
 
 `components/PointsDeVente.tsx` is `'use client'` and dynamically imports Leaflet inside `useEffect` (SSR-safe). It is also dynamically imported in `page.tsx` with `{ ssr: false }`.
+
+**Points de vente are Sanity-managed** (like miels): `page.tsx` server-fetches `getPointsDeVente()` and passes the result to `<PointsDeVente points={...} />` (the `dynamic` import still accepts props). `getPointsDeVente()` mirrors `getMiels()` — GROQ `*[_type == "pointDeVente" && enLigne != false] | order(ordre asc)` with `revalidate: 60`, a `normalisePointsDeVente()` null-safety layer, and a **static fallback to `POINTS_DE_VENTE` (lib/data.ts)** when Sanity is absent/empty/errors. Schema: `sanity/schemaTypes/pointDeVente.ts` (nom, ville, lat, lng, url?, `enLigne`, ordre); registered in `schemaTypes/index.ts` and in the custom studio structure in `sanity.config.ts`. Seed the 18 existing points with `npm run seed:points` (`scripts/seed-points.ts`, deterministic `_id: pdv-<id>`). **The `MIELLERIE` marker stays static in `lib/data.ts`** (Sophie's own fixed location). The fallback makes deploying code before seeding safe.
 
 Tiles: CARTO Voyager with a sepia filter (`filter: sepia(0.18) saturate(0.92)`) defined in `globals.css` under `#carte-pdv .leaflet-tile-pane`.
 
@@ -189,26 +194,28 @@ components/
   BonDeCommande.tsx         Order form + cart recap; structured address, SIRET (pro), delivery checkbox (particulier); particulier = TTC/frais de port/total, entreprise = devis (no price, CTA « Demander un devis »); confetti on submit success
   CartFab.tsx               Floating cart button, spring animation, order panel overlay
   APropos.tsx               Sophie's story, portrait, italic quote, AB logo
-  PointsDeVente.tsx         Leaflet map, 18 store pins, fly-to on list click
+  PointsDeVente.tsx         Leaflet map, store pins (points via props from Sanity/fallback), fly-to on list click
   Faq.tsx                   FAQ section, copy sourced from FAQ_ITEMS in lib/seo.ts
-  Footer.tsx                Contact, nav links, BioBadge, copyright
+  Footer.tsx                Contact, nav links, BioBadge, copyright; Instagram link + « Laisser un avis Google » (both conditional on CONTACT.instagram / GOOGLE_AVIS_URL)
   JsonLd.tsx                Server component injecting LocalBusiness + Product + FAQ JSON-LD
   Loader.tsx                'use client' startup splash (cream + Great Vibes logotype + shimmer bar); fades out on DOM ready, mounted in layout.tsx
 
 lib/
   types.ts                  Miel, Format (prix + prixPro as numbers), ClientType, PointDeVente, Contact, ClientInfo, Selection
-  data.ts                   Static fallback: MIELS_STATIC (6 miels, prix + prixPro as numbers), POINTS_DE_VENTE, MIELLERIE, CONTACT
+  data.ts                   Static fallback: MIELS_STATIC (6 miels, prix + prixPro as numbers), POINTS_DE_VENTE, MIELLERIE, CONTACT (+ instagram), GOOGLE_AVIS_URL (placeholder — Google review link, empty by default)
   cart.tsx                  CartContext, CartProvider, useCart (clientType, livraison, setQte, resetClient)
   order.ts                  prixToNumber (tolerates string|number), prixValeur, formatPrix, prixFormat, poidsToGrammes, cartonLabel, fraisLivraison, formatEuro, panierTotaux, trouveItem, buildOrderBody; consts TVA_PRO, POTS_PAR_CARTON, FRAIS_PORT
   seo.ts                    SITE_URL, JSON-LD builders, FAQ_ITEMS
   sanity.client.ts          sanityClient (createClient)
-  sanity.queries.ts         getMiels() + normaliseMiels() — Sanity or static fallback, null/shape resilience layer
+  sanity.queries.ts         getMiels()/getPointsDeVente() + normalise*() — Sanity or static fallback, null/shape resilience layer
 
 sanity/
   schemaTypes/miel.ts       Sanity schema for honey documents
+  schemaTypes/pointDeVente.ts Sanity schema for retail points de vente (feeds the map)
 
 scripts/
   seed-sanity.ts            Uploads images + creates/replaces all 6 miel documents (derives from MIELS_STATIC)
+  seed-points.ts            Creates/replaces the points de vente docs (derives from POINTS_DE_VENTE; `_id: pdv-<id>`); `npm run seed:points`
   local/                    Gitignored Sanity ops tooling (need SANITY_API_TOKEN); dumps land in gitignored sanity-backups/
     sanity-backup.mjs         Full dataset export (docs + assets) → sanity-backups/<dataset>-<stamp>.tar.gz
     sanity-restore.mjs        Restore prod from a backup — DESTRUCTIVE (deletes all miels, re-imports); dry-run unless --yes; `npm run restore`

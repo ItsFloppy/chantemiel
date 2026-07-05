@@ -9,7 +9,7 @@ export function Faq() {
         <div className="mb-10 md:mb-14">
           <SectionLabel>Questions fréquentes</SectionLabel>
           <h2 className="mt-4 font-display text-4xl leading-tight text-ink md:text-5xl">
-            Les questions qu&apos;on<br className="hidden md:block" /> me pose souvent
+            Les questions que l&apos;on<br className="hidden md:block" /> me pose souvent
           </h2>
         </div>
 
