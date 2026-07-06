@@ -132,4 +132,4 @@ export const CONTACT: Contact = {
  * QUE si cette URL est renseignée. À compléter avec le lien du type
  * `https://search.google.com/local/writereview?placeid=…` ou `https://g.page/r/…`.
  */
-export const GOOGLE_AVIS_URL: string = ''
+export const GOOGLE_AVIS_URL: string = 'https://g.page/r/Cd_8iykufJw_EAE/review'

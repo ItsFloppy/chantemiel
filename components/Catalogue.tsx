@@ -221,11 +221,10 @@ export function Catalogue({ miels }: { miels: Miel[] }) {
           <figure className="max-w-sm border-l-2 border-honey/60 pl-5">
             <blockquote className="font-display text-lg italic leading-relaxed text-ink-soft md:text-xl">
               « En apiculture biologique, la récolte suit les saisons : les variétés et
-              leur disponibilité varient au fil de l&apos;année. Le statut de chaque format
-              est tenu à jour. »
+              leurs disponibilités évoluent au fil de l&apos;année. »
             </blockquote>
             <figcaption className="mt-3 font-body text-sm font-semibold text-honey-deep">
-              Sophie, votre apicultrice
+              Sophie
             </figcaption>
           </figure>
         </div>

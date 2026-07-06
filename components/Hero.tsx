@@ -32,9 +32,8 @@ export function Hero() {
 
           <Reveal delay={240}>
             <p className="mt-6 max-w-xl font-body text-base leading-relaxed text-cream/85 sm:text-lg">
-              Sophie Mus, apicultrice récoltante dans le Vaucluse. Deux cents ruches
-              menées en pleine nature, sans antibiotique ni répulsif. Des miels récoltés
-              et conditionnés à température ambiante, du Luberon à l&apos;Isère.
+              Sophie Mus, apicultrice récoltante dans le Vaucluse. Deux cents ruches en pleine nature, sans antibiotiques ni répulsifs.
+              Des miels récoltés et conditionnés à température ambiante, du Luberon à l&apos;Isère.
             </p>
           </Reveal>
 
