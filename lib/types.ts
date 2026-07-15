@@ -52,6 +52,12 @@ export interface ClientInfo {
   ville: string
   // Entreprise uniquement
   siret: string
+  /** Type d'établissement pro (magasin bio, restaurant, hôtel, chocolaterie…). */
+  typeEtablissement: string
+  /** Volume / fréquence estimés (texte libre, ex. « 2 cartons par mois »). */
+  volumeEstime: string
+  /** Opt-in livraisons régulières (récurrentes). Par défaut la commande est ponctuelle. */
+  livraisonReguliere: boolean
   message: string
 }
 

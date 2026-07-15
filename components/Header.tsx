@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useCart } from '@/lib/cart'
 
 const NAV = [
   { label: 'Les miels', href: '#catalogue' },
+  { label: 'Professionnels', href: '#professionnels' },
   { label: 'Commander', href: '#commander' },
   { label: 'La miellerie', href: '#miellerie' },
   { label: 'Points de vente', href: '#points-de-vente' },
@@ -13,6 +15,7 @@ const NAV = [
 export function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
+  const { setClientType } = useCart()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
@@ -20,6 +23,19 @@ export function Header() {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  // « Professionnels » n'est visible qu'en mode Entreprise : on bascule le switch
+  // puis on scrolle jusqu'à la section (elle se monte après le changement d'état).
+  function handleNav(e: React.MouseEvent, href: string) {
+    setOpen(false)
+    if (href === '#professionnels') {
+      e.preventDefault()
+      setClientType('entreprise')
+      setTimeout(() => {
+        document.getElementById('professionnels')?.scrollIntoView({ behavior: 'smooth' })
+      }, 60)
+    }
+  }
 
   // Fond clair dès que l'on scrolle OU que le menu mobile est ouvert,
   // pour garder les libellés lisibles même tout en haut de page.
@@ -49,6 +65,7 @@ export function Header() {
             <a
               key={n.href}
               href={n.href}
+              onClick={e => handleNav(e, n.href)}
               className={
                 'group relative font-body text-sm font-semibold tracking-wide transition-colors ' +
                 (solid ?'text-ink/80 hover:text-honey-deep' : 'text-cream/90 hover:text-cream')
@@ -88,7 +105,7 @@ export function Header() {
             <a
               key={n.href}
               href={n.href}
-              onClick={() => setOpen(false)}
+              onClick={e => handleNav(e, n.href)}
               className="border-b border-ink/5 py-3 font-body text-base font-semibold text-ink/80"
             >
               {n.label}

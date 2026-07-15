@@ -133,3 +133,17 @@ export const CONTACT: Contact = {
  * `https://search.google.com/local/writereview?placeid=…` ou `https://g.page/r/…`.
  */
 export const GOOGLE_AVIS_URL: string = 'https://g.page/r/Cd_8iykufJw_EAE/review'
+
+/**
+ * Identifiant du feed Instagram Behold (behold.so). La section « Sur Instagram »
+ * ne s'affiche QUE s'il est renseigné (via NEXT_PUBLIC_BEHOLD_FEED_ID).
+ * Prérequis : compte Instagram Business/Creator connecté à Behold.
+ */
+export const BEHOLD_FEED_ID: string = process.env.NEXT_PUBLIC_BEHOLD_FEED_ID ?? ''
+
+/**
+ * Identifiant du widget d'avis Featurable (featurable.com), qui affiche les vrais
+ * avis Google. La section « Avis » ne s'affiche QUE s'il est renseigné
+ * (via NEXT_PUBLIC_FEATURABLE_ID).
+ */
+export const FEATURABLE_ID: string = process.env.NEXT_PUBLIC_FEATURABLE_ID ?? ''

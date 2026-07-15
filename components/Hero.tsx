@@ -1,5 +1,6 @@
 import { Reveal } from './ui/Reveal'
 import { BioBadge } from './ui/BioBadge'
+import { ProSwitchLink } from './ui/ProSwitchLink'
 
 export function Hero() {
   return (
@@ -17,34 +18,33 @@ export function Hero() {
       <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/40 to-ink/55" />
       <div className="absolute inset-0 bg-gradient-to-r from-ink/55 to-transparent" />
 
-      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-7xl flex-col justify-end px-5 pb-16 pt-32 md:px-10 md:pb-24">
+      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-7xl flex-col justify-center px-5 py-24 md:px-10 md:py-28">
         <div className="max-w-3xl">
           <Reveal>
             <BioBadge />
           </Reveal>
 
           <Reveal delay={120}>
-            <h1 className="mt-6 font-display text-[2.7rem] leading-[1.04] text-cream sm:text-6xl md:text-7xl">
+            <h1 className="mt-5 font-display text-[2.7rem] leading-[1.04] text-cream sm:text-6xl md:text-7xl">
               Du miel bio,<br className="hidden sm:block" /> récolté à la main{' '}
               <span className="whitespace-nowrap">en <span className="italic text-honey">Provence</span></span>
             </h1>
           </Reveal>
 
           <Reveal delay={240}>
-            <p className="mt-6 max-w-xl font-body text-base leading-relaxed text-cream/85 sm:text-lg">
+            <p className="mt-4 max-w-xl font-body text-base leading-relaxed text-cream/85 sm:text-lg">
               Sophie Mus, apicultrice récoltante dans le Vaucluse. Deux cents ruches en pleine nature, sans antibiotiques ni répulsifs.
-              Des miels récoltés et conditionnés à température ambiante, du Luberon à l&apos;Isère.
+              Des miels récoltés et conditionnés à température ambiante, vendus en circuit court, du Luberon à l&apos;Isère.
             </p>
           </Reveal>
 
           <Reveal delay={360}>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <a
                 href="#catalogue"
-                className="group inline-flex items-center justify-center gap-2 rounded-full bg-honey px-7 py-3.5 font-body text-base font-bold text-white shadow-jar transition-all hover:bg-honey-deep"
+                className="inline-flex items-center justify-center rounded-full bg-honey px-7 py-3.5 font-body text-base font-bold text-white shadow-jar transition-all hover:bg-honey-deep"
               >
                 Découvrir les miels
-                <span className="transition-transform group-hover:translate-x-1">→</span>
               </a>
               <a
                 href="#commander"
@@ -52,6 +52,15 @@ export function Hero() {
               >
                 Remplir un bon de commande
               </a>
+              <ProSwitchLink className="group inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-honey/50 bg-honey/[0.08] px-6 py-3.5 backdrop-blur-sm transition-colors hover:border-honey hover:bg-honey/15">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 flex-shrink-0 text-honey">
+                  <rect x="2" y="7" width="20" height="14" rx="2" />
+                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                </svg>
+                <span className="font-body text-sm font-semibold text-cream/90 group-hover:text-cream">
+                  Professionnels&nbsp;: vente en gros sur devis
+                </span>
+              </ProSwitchLink>
             </div>
           </Reveal>
         </div>
