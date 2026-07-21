@@ -1,10 +1,19 @@
 import { defineField, defineType } from 'sanity'
+import { MapsAutofillInput } from '../components/MapsAutofillInput'
 
 export const pointDeVente = defineType({
   name: 'pointDeVente',
   title: 'Point de vente',
   type: 'document',
   fields: [
+    defineField({
+      name: 'lienMaps',
+      title: 'Lien Google Maps',
+      description: 'Le plus simple pour commencer : collez ici un lien Google Maps du magasin, puis cliquez sur « Remplir automatiquement » pour renseigner le nom, les coordonnées et la ville ci-dessous.',
+      type: 'url',
+      validation: Rule => Rule.uri({ scheme: ['http', 'https'] }),
+      components: { input: MapsAutofillInput },
+    }),
     defineField({
       name: 'nom',
       title: 'Nom du magasin',
@@ -28,14 +37,14 @@ export const pointDeVente = defineType({
       name: 'lat',
       title: 'Latitude',
       type: 'number',
-      description: 'Coordonnée GPS. Astuce : sur Google Maps, clic droit sur le lieu → cliquez sur les chiffres pour les copier (le 1ᵉʳ nombre = latitude, ex. 43.9620).',
+      description: 'Rempli automatiquement par le lien Google Maps ci-dessus (modifiable à la main si besoin). Manuellement : clic droit sur le lieu dans Google Maps → cliquez sur les chiffres pour les copier (le 1ᵉʳ nombre = latitude, ex. 43.9620).',
       validation: Rule => Rule.required().min(-90).max(90),
     }),
     defineField({
       name: 'lng',
       title: 'Longitude',
       type: 'number',
-      description: 'Coordonnée GPS (2ᵉ nombre du clic droit Google Maps, ex. 4.8120).',
+      description: 'Rempli automatiquement par le lien Google Maps ci-dessus (2ᵉ nombre du clic droit Google Maps, ex. 4.8120).',
       validation: Rule => Rule.required().min(-180).max(180),
     }),
     defineField({
