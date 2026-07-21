@@ -78,10 +78,10 @@ export const metadata: Metadata = {
       "Des miels d'exception récoltés à la main en Provence par Sophie Mus, certifiés Agriculture Biologique (Ecocert).",
     images: [
       {
-        url: '/images/pyramide-pots.jpg',
+        url: '/images/apercu.jpeg',
         width: 1200,
-        height: 630,
-        alt: 'Pots de miel Chantemiel devant le massif du Luberon',
+        height: 1600,
+        alt: 'Miels bio Chantemiel, récoltés à la main en Provence par Sophie Mus',
       },
     ],
   },
@@ -90,7 +90,7 @@ export const metadata: Metadata = {
     title: 'Chantemiel, miel bio du Luberon',
     description:
       'Des miels certifiés BIO Ecocert, récoltés en Provence par Sophie Mus, dans le Vaucluse.',
-    images: ['/images/pyramide-pots.jpg'],
+    images: ['/images/apercu.jpeg'],
   },
 }
 

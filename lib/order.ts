@@ -140,7 +140,6 @@ export function buildOrderBody(
     message: client.message,
     panier,
     poids: `${poidsKg.toLocaleString('fr-FR', { maximumFractionDigits: 2 })} kg`,
-    frequence: client.livraisonReguliere ? 'Livraisons régulières (récurrente)' : 'Commande ponctuelle',
   }
 
   if (type === 'entreprise') {
@@ -150,6 +149,7 @@ export function buildOrderBody(
       siret: client.siret,
       etablissement: client.typeEtablissement || '—',
       volume_estime: client.volumeEstime || '—',
+      frequence: client.livraisonReguliere ? 'Livraisons régulières (récurrente)' : 'Commande ponctuelle',
       pots: `${totalArticles} pot${totalArticles > 1 ? 's' : ''} (${cartonLabel(totalArticles)})`,
     }
   }

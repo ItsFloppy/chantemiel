@@ -10,7 +10,6 @@ import { AvisGoogle } from '@/components/AvisGoogle'
 import { Faq } from '@/components/Faq'
 import { Footer } from '@/components/Footer'
 import { CartFab } from '@/components/CartFab'
-import { StickyToggle } from '@/components/StickyToggle'
 import { JsonLd } from '@/components/JsonLd'
 
 export const revalidate = 60
@@ -31,14 +30,13 @@ export default async function Home() {
         <Hero />
         <Catalogue miels={miels} />
         <BonDeCommande miels={miels} />
+        <AvisGoogle />
         <APropos />
         <InstagramFeed />
-        <AvisGoogle />
         <PointsDeVente points={points} />
         <Faq />
       </main>
       <Footer />
-      <StickyToggle />
       <CartFab miels={miels} />
     </>
   )

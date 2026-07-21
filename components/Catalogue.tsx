@@ -197,9 +197,7 @@ function ClientTypeBanner() {
   return (
     <div className="mb-10 flex flex-col items-start gap-2.5 md:mb-12">
       <span className="font-body text-sm text-ink-soft">Vous commandez en tant que</span>
-      <div id="catalogue-toggle">
-        <ClientTypeToggle tone="light" />
-      </div>
+      <ClientTypeToggle tone="light" />
       <p className="font-body text-xs text-ink-soft/75">
         {clientType === 'entreprise'
           ? 'Tarifs sur devis : composez votre sélection, je vous recontacte avec une proposition adaptée · par carton de 12'

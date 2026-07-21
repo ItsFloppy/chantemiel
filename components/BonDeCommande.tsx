@@ -153,24 +153,17 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
 
   return (
     <form onSubmit={e => submitOrder(e, miels)} className="flex flex-col gap-8">
-      {/* Type de client — affiché dans le panneau flottant du panier uniquement ;
-          sur la page, c'est le switch collant (StickyToggle) qui fait le travail. */}
-      {(stack || pro) && (
-        <div className="flex flex-col items-start gap-2.5">
-          {stack && (
-            <>
-              <span className="font-body text-sm text-cream/60">Je commande en tant que</span>
-              <ClientTypeToggle tone="dark" />
-            </>
-          )}
-          {pro && (
-            <p className="max-w-xl font-body text-xs leading-relaxed text-cream/55">
-              En tant qu&apos;entreprise, vous ne réglez pas en ligne : composez votre sélection
-              et demandez un devis. Je reviens vers vous avec une proposition tarifaire adaptée.
-            </p>
-          )}
-        </div>
-      )}
+      {/* Type de client */}
+      <div className="flex flex-col items-start gap-2.5">
+        <span className="font-body text-sm text-cream/60">Je commande en tant que</span>
+        <ClientTypeToggle tone="dark" />
+        {pro && (
+          <p className="max-w-xl font-body text-xs leading-relaxed text-cream/55">
+            En tant qu&apos;entreprise, vous ne réglez pas en ligne : composez votre sélection
+            et demandez un devis. Je reviens vers vous avec une proposition tarifaire adaptée.
+          </p>
+        )}
+      </div>
 
       <div className={'grid gap-8 ' + (stack ? '' : 'lg:grid-cols-[1fr_1.1fr] lg:gap-12')}>
       {/* Récapitulatif panier */}
@@ -311,12 +304,15 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
           <Alerte>Votre panier dépasse 5 kg : la livraison postale n’est pas disponible. Contactez-moi pour organiser le transport.</Alerte>
         )}
 
-        <CheckboxDark
-          checked={client.livraisonReguliere}
-          onChange={v => setClient({ ...client, livraisonReguliere: v })}
-          label="Je souhaite des livraisons régulières"
-          hint="Cochez pour un réapprovisionnement récurrent. Par défaut, votre commande est ponctuelle."
-        />
+        {/* Réapprovisionnement récurrent : pertinent pour les pros uniquement. */}
+        {pro && (
+          <CheckboxDark
+            checked={client.livraisonReguliere}
+            onChange={v => setClient({ ...client, livraisonReguliere: v })}
+            label="Je souhaite des livraisons régulières"
+            hint="Cochez pour un réapprovisionnement récurrent. Par défaut, votre commande est ponctuelle."
+          />
+        )}
 
         <textarea className={CHAMP + ' min-h-[96px] resize-y'} placeholder="Un mot pour Sophie (facultatif)" value={client.message} onChange={e => setClient({ ...client, message: e.target.value })} />
         {erreur && <Alerte>{erreur}</Alerte>}
@@ -352,8 +348,6 @@ export function BonDeCommande({ miels }: { miels: Miel[] }) {
           </p>
         </div>
         <OrderForm miels={miels} />
-        {/* Ancre de fin : le switch collant se détache une fois le formulaire passé. */}
-        <div id="commander-end" aria-hidden className="h-0" />
       </div>
     </section>
   )

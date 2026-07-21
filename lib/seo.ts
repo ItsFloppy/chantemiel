@@ -31,7 +31,7 @@ export function buildLocalBusinessLd() {
     legalName: business.legalName,
     description: business.description,
     url: SITE_URL,
-    image: `${SITE_URL}/images/pyramide-pots.jpg`,
+    image: `${SITE_URL}/images/apercu.jpeg`,
     logo: `${SITE_URL}/images/logo.png`,
     email: CONTACT.email,
     telephone: '+33634992399',
