@@ -60,7 +60,7 @@ export function PointsDeVente({ points }: { points: PointDeVente[] }) {
         .addTo(map)
         .bindPopup(
           `<strong>${p.nom}</strong><br><span style="color:#5C4A35">${p.ville}</span>` +
-          (p.url ? `<br><a href="${p.url}" target="_blank" rel="noopener" style="color:#C96A00;font-weight:600">Voir le magasin →</a>` : '')
+          (p.url ? `<br><a href="${p.url}" target="_blank" rel="noopener" style="color:#C96A00;font-weight:600">Voir le magasin</a>` : '')
         )
       m.on('click', () => setSelected(p.id))
       markersRef.current[p.id] = m

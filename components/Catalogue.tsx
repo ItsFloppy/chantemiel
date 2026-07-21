@@ -6,6 +6,7 @@ import { SectionLabel } from './ui/SectionLabel'
 import { StatutPastille } from './ui/StatutPastille'
 import { ClientTypeToggle } from './ui/ClientTypeToggle'
 import { Reveal } from './ui/Reveal'
+import { Professionnels } from './Professionnels'
 import { prixFormat } from '@/lib/order'
 import type { Miel } from '@/lib/types'
 
@@ -220,8 +221,8 @@ export function Catalogue({ miels }: { miels: Miel[] }) {
 
           <figure className="max-w-sm border-l-2 border-honey/60 pl-5">
             <blockquote className="font-display text-lg italic leading-relaxed text-ink-soft md:text-xl">
-              « En apiculture biologique, la récolte suit les saisons : les variétés et
-              leurs disponibilités évoluent au fil de l&apos;année. »
+              «&nbsp;En apiculture biologique, la récolte suit les saisons : les variétés et
+              leurs disponibilités évoluent au fil de l&apos;année.&nbsp;»
             </blockquote>
             <figcaption className="mt-3 font-body text-sm font-semibold text-honey-deep">
               Sophie
@@ -230,6 +231,8 @@ export function Catalogue({ miels }: { miels: Miel[] }) {
         </div>
 
         <ClientTypeBanner />
+
+        <Professionnels />
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {miels.map(m => (

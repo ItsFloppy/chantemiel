@@ -147,6 +147,9 @@ export function buildOrderBody(
     return {
       ...base,
       siret: client.siret,
+      etablissement: client.typeEtablissement || '—',
+      volume_estime: client.volumeEstime || '—',
+      frequence: client.livraisonReguliere ? 'Livraisons régulières (récurrente)' : 'Commande ponctuelle',
       pots: `${totalArticles} pot${totalArticles > 1 ? 's' : ''} (${cartonLabel(totalArticles)})`,
     }
   }

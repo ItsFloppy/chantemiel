@@ -31,7 +31,7 @@ export function buildLocalBusinessLd() {
     legalName: business.legalName,
     description: business.description,
     url: SITE_URL,
-    image: `${SITE_URL}/images/pyramide-pots.jpg`,
+    image: `${SITE_URL}/images/apercu.jpeg`,
     logo: `${SITE_URL}/images/logo.png`,
     email: CONTACT.email,
     telephone: '+33634992399',
@@ -122,6 +122,10 @@ export const FAQ_ITEMS = [
   {
     q: 'Comment passer commande ?',
     a: "Choisissez vos miels et formats sur le site, remplissez le bon de commande, et je vous recontacte par e-mail pour organiser le règlement et l’envoi ou le retrait. Il n’y a pas de paiement en ligne : tout se fait en direct, entre nous.",
+  },
+  {
+    q: 'Vendez-vous en gros aux professionnels ?',
+    a: "Oui. Je fournis en gros les magasins bio, épiceries fines, restaurants, hôtels et chocolateries en miel bio de Provence, par carton de 12 pots, avec la régularité d’une exploitation de 200 ruches. Composez votre sélection et demandez un devis : je vous réponds avec une proposition tarifaire personnalisée. Un échantillon avant référencement est possible.",
   },
 ]
 

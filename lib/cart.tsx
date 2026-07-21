@@ -13,6 +13,9 @@ const CLIENT_VIDE: ClientInfo = {
   codePostal: '',
   ville: '',
   siret: '',
+  typeEtablissement: '',
+  volumeEstime: '',
+  livraisonReguliere: false,
   message: '',
 }
 

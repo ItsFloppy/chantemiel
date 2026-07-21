@@ -3,8 +3,11 @@
 import { useEffect } from 'react'
 import Image from 'next/image'
 import { useCart } from '@/lib/cart'
+import { GOOGLE_AVIS_URL } from '@/lib/data'
 import { SectionLabel } from './ui/SectionLabel'
 import { ClientTypeToggle } from './ui/ClientTypeToggle'
+import { DropdownDark } from './ui/DropdownDark'
+import { CheckboxDark } from './ui/CheckboxDark'
 import {
   cartonLabel,
   formatEuro,
@@ -123,6 +126,20 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
           {pro ? 'Votre demande de devis a bien été transmise' : 'Votre bon de commande a bien été transmis'}. Je reviens vers vous très vite
           à l&apos;adresse <span className="text-honey">{client.email || 'votre e-mail'}</span>.
         </p>
+        {GOOGLE_AVIS_URL && (
+          <a
+            href={GOOGLE_AVIS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="merci-item mt-6 inline-flex items-center gap-2 rounded-full border border-honey/50 bg-honey/10 px-5 py-2.5 font-body text-sm font-semibold text-cream transition-colors hover:bg-honey/20"
+            style={{ animationDelay: '.18s' }}
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4 text-honey">
+              <path d="M12 2l2.9 6.26 6.7.94-4.8 4.34 1.28 6.86L12 17.1l-6.08 3.3L7.2 13.54 2.4 9.2l6.7-.94L12 2z" />
+            </svg>
+            Déjà client·e&nbsp;? Laissez-moi un avis Google
+          </a>
+        )}
         <button
           onClick={() => { setEnvoye(false); setSelection({}); resetClient() }}
           className="merci-item mt-7 rounded-full border border-cream/30 px-6 py-2.5 font-body text-sm font-semibold text-cream transition-colors hover:bg-cream/10"
@@ -157,7 +174,7 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
             <p className="py-6 text-center font-body text-sm text-cream/50">
               Votre panier est vide.<br />
               <a href="#catalogue" className="mt-2 inline-block font-semibold text-honey hover:underline">
-                Parcourir les miels →
+                Parcourir les miels
               </a>
             </p>
           ) : (
@@ -245,6 +262,23 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
             onChange={e => setClient({ ...client, siret: e.target.value.replace(/\D/g, '').slice(0, 14) })}
           />
         )}
+        {pro && (
+          <>
+            <DropdownDark
+              value={client.typeEtablissement}
+              onChange={v => setClient({ ...client, typeEtablissement: v })}
+              placeholder="Type d'établissement…"
+              triggerClassName={CHAMP}
+              options={['Magasin bio', 'Épicerie fine', 'Restaurant', 'Hôtel', 'Chocolaterie / pâtisserie', 'Grossiste / distributeur', 'Autre']}
+            />
+            <input
+              className={CHAMP}
+              placeholder="Volume / fréquence estimés (ex. 2 cartons par mois)"
+              value={client.volumeEstime}
+              onChange={e => setClient({ ...client, volumeEstime: e.target.value })}
+            />
+          </>
+        )}
 
         {/* Adresse structurée */}
         <div className="grid gap-3 sm:grid-cols-[110px_1fr]">
@@ -258,29 +292,26 @@ export function OrderForm({ miels, stack = false }: { miels: Miel[]; stack?: boo
 
         {/* Livraison — particulier uniquement */}
         {!pro && (
-          <label className={'flex items-start gap-3 ' + (livraisonImpossible ? 'cursor-not-allowed opacity-50' : 'cursor-pointer')}>
-            <span className="relative mt-0.5 grid h-5 w-5 flex-shrink-0 place-items-center">
-              <input
-                type="checkbox"
-                checked={livraison}
-                disabled={livraisonImpossible}
-                onChange={e => setLivraison(e.target.checked)}
-                className="peer h-5 w-5 appearance-none rounded-md border-2 border-honey/50 bg-transparent transition-colors checked:border-honey checked:bg-honey enabled:cursor-pointer enabled:hover:border-honey/80 disabled:cursor-not-allowed"
-              />
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="pointer-events-none absolute h-3 w-3 text-white opacity-0 transition-opacity peer-checked:opacity-100">
-                <path d="M5 13l4 4L19 7" />
-              </svg>
-            </span>
-            <span className="font-body text-sm text-cream/85">
-              <span className="font-semibold text-cream">Je souhaite être livré·e par voie postale</span>
-              <span className="mt-1 block text-xs leading-relaxed text-cream/55">
-                Frais de port à votre charge (tarifs La Poste) : jusqu’à 3 kg → 18,00 € · de 3 à 5 kg → 24,50 €. Pas d’envoi postal au-delà de 5 kg.
-              </span>
-            </span>
-          </label>
+          <CheckboxDark
+            checked={livraison}
+            disabled={livraisonImpossible}
+            onChange={setLivraison}
+            label="Je souhaite être livré·e par voie postale"
+            hint="Frais de port à votre charge (tarifs La Poste) : jusqu’à 3 kg : 18,00 € · de 3 à 5 kg : 24,50 €. Pas d’envoi postal au-delà de 5 kg."
+          />
         )}
         {livraisonImpossible && (
           <Alerte>Votre panier dépasse 5 kg : la livraison postale n’est pas disponible. Contactez-moi pour organiser le transport.</Alerte>
+        )}
+
+        {/* Réapprovisionnement récurrent : pertinent pour les pros uniquement. */}
+        {pro && (
+          <CheckboxDark
+            checked={client.livraisonReguliere}
+            onChange={v => setClient({ ...client, livraisonReguliere: v })}
+            label="Je souhaite des livraisons régulières"
+            hint="Cochez pour un réapprovisionnement récurrent. Par défaut, votre commande est ponctuelle."
+          />
         )}
 
         <textarea className={CHAMP + ' min-h-[96px] resize-y'} placeholder="Un mot pour Sophie (facultatif)" value={client.message} onChange={e => setClient({ ...client, message: e.target.value })} />
@@ -312,7 +343,8 @@ export function BonDeCommande({ miels }: { miels: Miel[] }) {
           </h2>
           <p className="mt-4 font-body text-base leading-relaxed text-cream/70">
             Pas de paiement en ligne : vous composez votre panier, je reçois votre demande par
-            e-mail et je vous recontacte pour le règlement et l&apos;envoi. Simple et direct.
+            e-mail et je vous recontacte pour le règlement et l&apos;envoi. Je privilégie la vente
+            locale et le circuit court&nbsp;: simple, direct, au plus près de chez vous.
           </p>
         </div>
         <OrderForm miels={miels} />
